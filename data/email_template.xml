@@ -1,0 +1,399 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        
+        <!-- =========================================== -->
+        <!-- EMAIL TEMPLATE: ORDER RECEIVED -->
+        <!-- =========================================== -->
+        <record id="email_template_order_received" model="mail.template">
+            <field name="name">Tailor Order - Received</field>
+            <field name="model_id" ref="model_tailor_order"/>
+            <field name="subject">Order #${object.name} Received - ${object.customer_id.name}</field>
+            <field name="email_from">${object.company_id.email or 'noreply@tailorshop.com'}</field>
+            <field name="email_to">${object.customer_email}</field>
+            <field name="lang">${object.customer_id.lang or 'en_US'}</field>
+            <field name="body_html" type="html">
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #f9f9f9;">
+                    <div style="background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                        <h2 style="color: #2c3e50; border-bottom: 3px solid #3498db; padding-bottom: 10px;">Order Received ✓</h2>
+                        <p style="font-size: 16px;">Dear <strong>${object.customer_id.name}</strong>,</p>
+                        <p>Thank you for your order! We have received your tailoring request.</p>
+                        
+                        <div style="background: #e8f4f8; padding: 20px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #3498db;">
+                            <h3 style="color: #3498db; margin-top: 0;">Order Details</h3>
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <tr>
+                                    <td style="padding: 8px 0;"><strong>Order Reference:</strong></td>
+                                    <td style="padding: 8px 0;">${object.name}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0;"><strong>Order Date:</strong></td>
+                                    <td style="padding: 8px 0;">${format_datetime(object.order_date, dt_format='dd MMM yyyy HH:mm')}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0;"><strong>Garment Type:</strong></td>
+                                    <td style="padding: 8px 0;">${object.garment_type.title()}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0;"><strong>Fabric:</strong></td>
+                                    <td style="padding: 8px 0;">${object.fabric_type or 'To be selected'}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0;"><strong>Total Amount:</strong></td>
+                                    <td style="padding: 8px 0;"><strong>${'%.2f' % object.total_amount} ${object.currency_id.symbol}</strong></td>
+                                </tr>
+                            </table>
+                        </div>
+                        
+                        <div style="background: #fff3cd; padding: 15px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #ffc107;">
+                            <strong>📋 Next Steps:</strong> Our team will contact you soon to schedule measurements.
+                        </div>
+                        
+                        <p style="text-align: center; margin: 30px 0;">
+                            <a href="${object._get_portal_url()}" 
+                               style="background: #3498db; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold;">
+                                Track Your Order
+                            </a>
+                        </p>
+                        
+                        <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;"/>
+                        
+                        <p style="color: #7f8c8d; font-size: 14px; text-align: center;">
+                            <strong>${object.company_id.name or 'Tailor Shop'}</strong><br/>
+                            ${object.company_id.phone or ''}<br/>
+                            ${object.company_id.email or ''}
+                        </p>
+                    </div>
+                </div>
+            </field>
+        </record>
+
+        <!-- =========================================== -->
+        <!-- EMAIL TEMPLATE: MEASUREMENT SCHEDULED -->
+        <!-- =========================================== -->
+        <record id="email_template_measurement" model="mail.template">
+            <field name="name">Tailor Order - Measurement</field>
+            <field name="model_id" ref="model_tailor_order"/>
+            <field name="subject">Measurement Time - Order #${object.name}</field>
+            <field name="email_from">${object.company_id.email or 'noreply@tailorshop.com'}</field>
+            <field name="email_to">${object.customer_email}</field>
+            <field name="lang">${object.customer_id.lang or 'en_US'}</field>
+            <field name="body_html" type="html">
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #f9f9f9;">
+                    <div style="background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                        <h2 style="color: #2c3e50; border-bottom: 3px solid #9b59b6; padding-bottom: 10px;">📏 Time for Measurements</h2>
+                        <p style="font-size: 16px;">Dear <strong>${object.customer_id.name}</strong>,</p>
+                        <p>Your order <strong>#${object.name}</strong> is ready for measurements.</p>
+                        
+                        <div style="background: #f4ecf7; padding: 20px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #9b59b6;">
+                            <p><strong>Please visit our shop or contact us to schedule your measurement appointment.</strong></p>
+                            <p style="margin: 10px 0;"><strong>Contact:</strong> ${object.company_id.phone or '+971 4 123 4567'}</p>
+                            <p style="margin: 10px 0;"><strong>Address:</strong> ${object.company_id.street or ''}, ${object.company_id.city or ''}</p>
+                        </div>
+                        
+                        <p style="text-align: center; margin: 30px 0;">
+                            <a href="${object._get_portal_url()}" 
+                               style="background: #9b59b6; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold;">
+                                View Order Details
+                            </a>
+                        </p>
+                        
+                        <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;"/>
+                        <p style="color: #7f8c8d; font-size: 14px; text-align: center;">
+                            <strong>${object.company_id.name or 'Tailor Shop'}</strong>
+                        </p>
+                    </div>
+                </div>
+            </field>
+        </record>
+
+        <!-- =========================================== -->
+        <!-- EMAIL TEMPLATE: IN PRODUCTION -->
+        <!-- =========================================== -->
+        <record id="email_template_production" model="mail.template">
+            <field name="name">Tailor Order - In Production</field>
+            <field name="model_id" ref="model_tailor_order"/>
+            <field name="subject">Your Order #${object.name} is In Production</field>
+            <field name="email_from">${object.company_id.email or 'noreply@tailorshop.com'}</field>
+            <field name="email_to">${object.customer_email}</field>
+            <field name="lang">${object.customer_id.lang or 'en_US'}</field>
+            <field name="body_html" type="html">
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #f9f9f9;">
+                    <div style="background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                        <h2 style="color: #2c3e50; border-bottom: 3px solid #f39c12; padding-bottom: 10px;">⚡ Production Update</h2>
+                        <p style="font-size: 16px;">Dear <strong>${object.customer_id.name}</strong>,</p>
+                        <p>Good news! Your order <strong>#${object.name}</strong> is now in production.</p>
+                        
+                        <div style="background: #fef5e7; padding: 20px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #f39c12;">
+                            <p><strong>Current Status:</strong> ${object.status.replace('_', ' ').title()}</p>
+                            <p><strong>Garment:</strong> ${object.garment_type.title()}</p>
+                            <p t-if="object.delivery_date"><strong>Expected Delivery:</strong> ${format_datetime(object.delivery_date, dt_format='dd MMM yyyy')}</p>
+                        </div>
+                        
+                        <p>Our skilled tailors are working on your garment. We'll notify you once it's ready!</p>
+                        
+                        <p style="text-align: center; margin: 30px 0;">
+                            <a href="${object._get_portal_url()}" 
+                               style="background: #f39c12; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold;">
+                                Track Progress
+                            </a>
+                        </p>
+                        
+                        <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;"/>
+                        <p style="color: #7f8c8d; font-size: 14px; text-align: center;">
+                            <strong>${object.company_id.name or 'Tailor Shop'}</strong>
+                        </p>
+                    </div>
+                </div>
+            </field>
+        </record>
+
+        <!-- =========================================== -->
+        <!-- EMAIL TEMPLATE: QUALITY CHECK -->
+        <!-- =========================================== -->
+        <record id="email_template_quality_check" model="mail.template">
+            <field name="name">Tailor Order - Quality Check</field>
+            <field name="model_id" ref="model_tailor_order"/>
+            <field name="subject">Quality Check - Order #${object.name}</field>
+            <field name="email_from">${object.company_id.email or 'noreply@tailorshop.com'}</field>
+            <field name="email_to">${object.customer_email}</field>
+            <field name="lang">${object.customer_id.lang or 'en_US'}</field>
+            <field name="body_html" type="html">
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #f9f9f9;">
+                    <div style="background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                        <h2 style="color: #2c3e50; border-bottom: 3px solid #34495e; padding-bottom: 10px;">🔍 Quality Check in Progress</h2>
+                        <p style="font-size: 16px;">Dear <strong>${object.customer_id.name}</strong>,</p>
+                        <p>Your order <strong>#${object.name}</strong> is undergoing our final quality check.</p>
+                        
+                        <div style="background: #ecf0f1; padding: 20px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #34495e;">
+                            <p>We're ensuring everything meets our high standards. Your garment will be ready very soon!</p>
+                        </div>
+                        
+                        <p style="text-align: center; margin: 30px 0;">
+                            <a href="${object._get_portal_url()}" 
+                               style="background: #34495e; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold;">
+                                Check Status
+                            </a>
+                        </p>
+                        
+                        <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;"/>
+                        <p style="color: #7f8c8d; font-size: 14px; text-align: center;">
+                            <strong>${object.company_id.name or 'Tailor Shop'}</strong>
+                        </p>
+                    </div>
+                </div>
+            </field>
+        </record>
+
+        <!-- =========================================== -->
+        <!-- EMAIL TEMPLATE: READY FOR DELIVERY -->
+        <!-- =========================================== -->
+        <record id="email_template_ready" model="mail.template">
+            <field name="name">Tailor Order - Ready for Delivery</field>
+            <field name="model_id" ref="model_tailor_order"/>
+            <field name="subject">🎉 Your Order #${object.name} is Ready!</field>
+            <field name="email_from">${object.company_id.email or 'noreply@tailorshop.com'}</field>
+            <field name="email_to">${object.customer_email}</field>
+            <field name="lang">${object.customer_id.lang or 'en_US'}</field>
+            <field name="body_html" type="html">
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #f9f9f9;">
+                    <div style="background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                        <div style="text-align: center; font-size: 60px; margin-bottom: 20px;">🎉</div>
+                        <h2 style="color: #27ae60; border-bottom: 3px solid #27ae60; padding-bottom: 10px; text-align: center;">Your Order is Ready!</h2>
+                        <p style="font-size: 16px; text-align: center;">Dear <strong>${object.customer_id.name}</strong>,</p>
+                        <p style="text-align: center;">Great news! Your order <strong>#${object.name}</strong> is now ready for pickup/delivery.</p>
+                        
+                        <div style="background: #d5f4e6; padding: 25px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #27ae60;">
+                            <h3 style="color: #27ae60; margin-top: 0;">Collection Details</h3>
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <tr>
+                                    <td style="padding: 8px 0;"><strong>Order Reference:</strong></td>
+                                    <td style="padding: 8px 0;">${object.name}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0;"><strong>Garment:</strong></td>
+                                    <td style="padding: 8px 0;">${object.garment_type.title()}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0;"><strong>Total Amount:</strong></td>
+                                    <td style="padding: 8px 0;"><strong>${'%.2f' % object.total_amount} ${object.currency_id.symbol}</strong></td>
+                                </tr>
+                                <tr style="background: #fffacd;">
+                                    <td style="padding: 8px 0;"><strong>Balance Due:</strong></td>
+                                    <td style="padding: 8px 0;"><strong style="color: #e74c3c; font-size: 18px;">${'%.2f' % object.balance_due} ${object.currency_id.symbol}</strong></td>
+                                </tr>
+                            </table>
+                        </div>
+                        
+                        <div style="background: #fff3cd; padding: 15px; border-radius: 5px; margin: 20px 0;">
+                            <p style="margin: 0;"><strong>📍 Shop Address:</strong></p>
+                            <p style="margin: 5px 0;">${object.company_id.street or '123 Tailor Street'}<br/>
+                            ${object.company_id.city or 'Dubai'}, ${object.company_id.country_id.name or 'UAE'}</p>
+                            <p style="margin: 5px 0;"><strong>📞 Contact:</strong> ${object.company_id.phone or '+971 4 123 4567'}</p>
+                        </div>
+                        
+                        <p style="text-align: center;"><strong>⚠️ Please bring this order reference when collecting.</strong></p>
+                        
+                        <p style="text-align: center; margin: 30px 0;">
+                            <a href="${object._get_portal_url()}" 
+                               style="background: #27ae60; color: white; padding: 15px 35px; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold; font-size: 16px;">
+                                View Order Details
+                            </a>
+                        </p>
+                        
+                        <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;"/>
+                        <p style="color: #7f8c8d; font-size: 14px; text-align: center;">
+                            <strong>${object.company_id.name or 'Tailor Shop'}</strong>
+                        </p>
+                    </div>
+                </div>
+            </field>
+        </record>
+
+        <!-- =========================================== -->
+        <!-- EMAIL TEMPLATE: DELIVERED -->
+        <!-- =========================================== -->
+        <record id="email_template_delivered" model="mail.template">
+            <field name="name">Tailor Order - Delivered</field>
+            <field name="model_id" ref="model_tailor_order"/>
+            <field name="subject">✅ Order #${object.name} Delivered - Thank You!</field>
+            <field name="email_from">${object.company_id.email or 'noreply@tailorshop.com'}</field>
+            <field name="email_to">${object.customer_email}</field>
+            <field name="lang">${object.customer_id.lang or 'en_US'}</field>
+            <field name="body_html" type="html">
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #f9f9f9;">
+                    <div style="background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                        <div style="text-align: center; font-size: 60px; margin-bottom: 20px;">✅</div>
+                        <h2 style="color: #2c3e50; border-bottom: 3px solid #3498db; padding-bottom: 10px; text-align: center;">Order Delivered Successfully</h2>
+                        <p style="font-size: 16px; text-align: center;">Dear <strong>${object.customer_id.name}</strong>,</p>
+                        <p style="text-align: center;">Your order <strong>#${object.name}</strong> has been successfully delivered.</p>
+                        
+                        <div style="background: #e8f4f8; padding: 20px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #3498db;">
+                            <h3 style="color: #3498db; margin-top: 0;">Order Summary</h3>
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <tr>
+                                    <td style="padding: 8px 0;"><strong>Order Reference:</strong></td>
+                                    <td style="padding: 8px 0;">${object.name}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0;"><strong>Order Date:</strong></td>
+                                    <td style="padding: 8px 0;">${format_datetime(object.order_date, dt_format='dd MMM yyyy')}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 8px 0;"><strong>Garment Type:</strong></td>
+                                    <td style="padding: 8px 0;">${object.garment_type.title()}</td>
+                                </tr>
+                            </table>
+                        </div>
+                        
+                        <p style="text-align: center; font-size: 16px;">We hope you're satisfied with your <strong>${object.garment_type}</strong>!</p>
+                        
+                        <div style="background: #d1ecf1; padding: 15px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #17a2b8;">
+                            <p style="margin: 0;">💡 If you need any alterations or have feedback, please don't hesitate to contact us at <strong>${object.company_id.phone or ''}</strong></p>
+                        </div>
+                        
+                        <p style="text-align: center; font-size: 18px; font-weight: bold; color: #27ae60; margin: 30px 0;">
+                            Thank you for choosing our tailoring services!
+                        </p>
+                        
+                        <p style="text-align: center;">We look forward to serving you again.</p>
+                        
+                        <p style="text-align: center; margin: 30px 0;">
+                            <a href="${object._get_portal_url()}" 
+                               style="background: #3498db; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold;">
+                                View Order History
+                            </a>
+                        </p>
+                        
+                        <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;"/>
+                        <p style="color: #7f8c8d; font-size: 14px; text-align: center;">
+                            <strong>${object.company_id.name or 'Tailor Shop'}</strong><br/>
+                            ${object.company_id.phone or ''}
+                        </p>
+                    </div>
+                </div>
+            </field>
+        </record>
+
+        <!-- =========================================== -->
+        <!-- EMAIL TEMPLATE: CANCELLED -->
+        <!-- =========================================== -->
+        <record id="email_template_cancelled" model="mail.template">
+            <field name="name">Tailor Order - Cancelled</field>
+            <field name="model_id" ref="model_tailor_order"/>
+            <field name="subject">Order #${object.name} Cancelled</field>
+            <field name="email_from">${object.company_id.email or 'noreply@tailorshop.com'}</field>
+            <field name="email_to">${object.customer_email}</field>
+            <field name="lang">${object.customer_id.lang or 'en_US'}</field>
+            <field name="body_html" type="html">
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #f9f9f9;">
+                    <div style="background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                        <h2 style="color: #e74c3c; border-bottom: 3px solid #e74c3c; padding-bottom: 10px;">Order Cancelled</h2>
+                        <p style="font-size: 16px;">Dear <strong>${object.customer_id.name}</strong>,</p>
+                        <p>Your order <strong>#${object.name}</strong> has been cancelled.</p>
+                        
+                        <div style="background: #fadbd8; padding: 20px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #e74c3c;">
+                            <p><strong>Order Reference:</strong> ${object.name}</p>
+                            <p><strong>Garment:</strong> ${object.garment_type.title()}</p>
+                        </div>
+                        
+                        <p>If you have any questions or would like to place a new order, please contact us:</p>
+                        <p><strong>Phone:</strong> ${object.company_id.phone or ''}<br/>
+                        <strong>Email:</strong> ${object.company_id.email or ''}</p>
+                        
+                        <p style="text-align: center; margin: 30px 0;">
+                            <a href="/my/tailor/orders" 
+                               style="background: #3498db; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold;">
+                                View All Orders
+                            </a>
+                        </p>
+                        
+                        <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;"/>
+                        <p style="color: #7f8c8d; font-size: 14px; text-align: center;">
+                            <strong>${object.company_id.name or 'Tailor Shop'}</strong>
+                        </p>
+                    </div>
+                </div>
+            </field>
+        </record>
+
+        <!-- =========================================== -->
+        <!-- EMAIL TEMPLATE: DELIVERY REMINDER -->
+        <!-- =========================================== -->
+        <record id="email_template_delivery_reminder" model="mail.template">
+            <field name="name">Tailor Order - Delivery Reminder</field>
+            <field name="model_id" ref="model_tailor_order"/>
+            <field name="subject">⏰ Reminder: Order #${object.name} - Expected Today</field>
+            <field name="email_from">${object.company_id.email or 'noreply@tailorshop.com'}</field>
+            <field name="email_to">${object.customer_email}</field>
+            <field name="lang">${object.customer_id.lang or 'en_US'}</field>
+            <field name="body_html" type="html">
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #f9f9f9;">
+                    <div style="background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                        <h2 style="color: #f39c12; border-bottom: 3px solid #f39c12; padding-bottom: 10px;">⏰ Delivery Reminder</h2>
+                        <p style="font-size: 16px;">Dear <strong>${object.customer_id.name}</strong>,</p>
+                        <p>This is a reminder that your order <strong>#${object.name}</strong> is scheduled for delivery today.</p>
+                        
+                        <div style="background: #fef5e7; padding: 20px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #f39c12;">
+                            <p><strong>Status:</strong> ${object.status.replace('_', ' ').title()}</p>
+                            <p>We're working to complete your order on time. We'll notify you as soon as it's ready for collection!</p>
+                        </div>
+                        
+                        <p style="text-align: center; margin: 30px 0;">
+                            <a href="${object._get_portal_url()}" 
+                               style="background: #f39c12; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold;">
+                                Check Order Status
+                            </a>
+                        </p>
+                        
+                        <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;"/>
+                        <p style="color: #7f8c8d; font-size: 14px; text-align: center;">
+                            <strong>${object.company_id.name or 'Tailor Shop'}</strong>
+                        </p>
+                    </div>
+                </div>
+            </field>
+        </record>
+
+    </data>
+</odoo>

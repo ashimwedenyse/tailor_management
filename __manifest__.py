@@ -1,0 +1,20 @@
+{
+    'name': 'Tailor Management',
+    'version': '1.0',
+    'category': 'Services',
+    'summary': 'Tailor business management system',
+    'description': 'Custom module for managing tailoring operations',
+    'author': 'Denyse Ashimwe',
+    'license': 'LGPL-3',
+    'depends': ['base', 'mail', 'portal', 'website'],
+    'data': [
+        'security/security.xml',
+        'security/ir.model.access.csv',
+        'data/sequences.xml',
+        'data/email_template.xml',
+        'views/tailor_order_views.xml',
+        'views/portal_templates.xml',
+    ],
+    'installable': True,
+    'application': True,
+}

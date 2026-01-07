@@ -1,0 +1,512 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+
+        <!-- =========================================== -->
+        <!-- LIST VIEW -->
+        <!-- =========================================== -->
+        <record id="view_tailor_order_tree" model="ir.ui.view">
+            <field name="name">tailor.order.list</field>
+            <field name="model">tailor.order</field>
+            <field name="arch" type="xml">
+                <tree string="Tailor Orders" decoration-success="status=='delivered'" 
+                      decoration-danger="status=='cancelled'" decoration-info="status=='ready'">
+                    <field name="name" string="Order Ref"/>
+                    <field name="customer_id" string="Customer"/>
+                    <field name="status" widget="badge" decoration-success="status=='delivered'" 
+                           decoration-warning="status in ['cutting','sewing','finishing']" 
+                           decoration-info="status=='ready'"/>
+                    <field name="garment_type" string="Garment"/>
+                    <field name="fabric_type" string="Fabric" optional="show"/>
+                    <field name="color" optional="hide"/>
+                    <field name="total_amount" string="Amount" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                    <field name="currency_id" invisible="1"/>
+                    <field name="balance_due" widget="monetary" options="{'currency_field': 'currency_id'}" optional="show"/>
+                    <field name="order_date" string="Order Date"/>
+                    <field name="delivery_date" string="Delivery Date" optional="show"/>
+                    <field name="salesperson_id" optional="hide"/>
+                    <field name="tailor_id" optional="hide"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- =========================================== -->
+        <!-- FORM VIEW -->
+        <!-- =========================================== -->
+        <record id="view_tailor_order_form" model="ir.ui.view">
+            <field name="name">tailor.order.form</field>
+            <field name="model">tailor.order</field>
+            <field name="arch" type="xml">
+                <form string="Tailor Order">
+                    <header>
+                        <!-- Status Workflow Buttons -->
+                        <button name="action_confirm_received" string="Confirm Received" 
+                                type="object" class="oe_highlight" 
+                                attrs="{'invisible': [('status', '!=', 'draft')]}"/>
+                        
+                        <button name="action_start_measurement" string="Start Measurement" 
+                                type="object" class="oe_highlight" 
+                                attrs="{'invisible': [('status', '!=', 'received')]}"/>
+                        
+                        <button name="action_start_cutting" string="Start Cutting" 
+                                type="object" class="oe_highlight" 
+                                attrs="{'invisible': [('status', '!=', 'measurement')]}"/>
+                        
+                        <button name="action_start_sewing" string="Start Sewing" 
+                                type="object" class="oe_highlight" 
+                                attrs="{'invisible': [('status', '!=', 'cutting')]}"/>
+                        
+                        <button name="action_start_finishing" string="Start Finishing" 
+                                type="object" class="oe_highlight" 
+                                attrs="{'invisible': [('status', '!=', 'sewing')]}"/>
+                        
+                        <button name="action_quality_check" string="Quality Check" 
+                                type="object" class="oe_highlight" 
+                                attrs="{'invisible': [('status', '!=', 'finishing')]}"/>
+                        
+                        <button name="action_mark_ready" string="Mark Ready" 
+                                type="object" class="oe_highlight" 
+                                attrs="{'invisible': [('status', '!=', 'quality_check')]}"/>
+                        
+                        <button name="action_mark_delivered" string="Mark Delivered" 
+                                type="object" class="oe_highlight" 
+                                attrs="{'invisible': [('status', '!=', 'ready')]}"/>
+                        
+                        <button name="action_cancel" string="Cancel Order" 
+                                type="object" 
+                                attrs="{'invisible': [('status', 'in', ['delivered', 'cancelled'])]}"/>
+                        
+                        <field name="status" widget="statusbar" 
+                               statusbar_visible="draft,received,measurement,cutting,sewing,finishing,quality_check,ready,delivered"/>
+                    </header>
+
+                    <sheet>
+                        <!-- Order Reference Badge -->
+                        <div class="oe_button_box" name="button_box">
+                            <button name="get_portal_url" type="object" 
+                                    class="oe_stat_button" icon="fa-external-link" 
+                                    string="Portal View"/>
+                            <button name="call_customer" type="object" 
+                                    class="oe_stat_button" icon="fa-phone" 
+                                    string="Call"/>
+                            <button name="email_customer" type="object" 
+                                    class="oe_stat_button" icon="fa-envelope" 
+                                    string="Email"/>
+                        </div>
+
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" readonly="1"/>
+                            </h1>
+                        </div>
+
+                        <group>
+                            <group name="customer_info" string="Customer Information">
+                                <field name="customer_id" options="{'no_create': True, 'no_open': True}"/>
+                                <field name="customer_phone" readonly="1"/>
+                                <field name="customer_email" readonly="1"/>
+                                <field name="order_date"/>
+                                <field name="delivery_date"/>
+                            </group>
+                            <group name="order_details" string="Order Details">
+                                <field name="garment_type"/>
+                                <field name="fabric_type" placeholder="e.g., Cotton, Silk, Wool"/>
+                                <field name="color" placeholder="e.g., Navy Blue, Black"/>
+                                <field name="salesperson_id"/>
+                                <field name="tailor_id"/>
+                            </group>
+                        </group>
+
+                        <notebook>
+                            <!-- Measurements Tab -->
+                            <page string="Measurements" name="measurements">
+                                <group>
+                                    <group string="Body Measurements">
+                                        <field name="chest_measurement" 
+                                               widget="float" 
+                                               placeholder="cm"/>
+                                        <field name="waist_measurement" 
+                                               widget="float" 
+                                               placeholder="cm"/>
+                                        <field name="hip_measurement" 
+                                               widget="float" 
+                                               placeholder="cm"/>
+                                        <field name="shoulder_width" 
+                                               widget="float" 
+                                               placeholder="cm"/>
+                                    </group>
+                                    <group string="Garment Measurements">
+                                        <field name="sleeve_length" 
+                                               widget="float" 
+                                               placeholder="cm"/>
+                                        <field name="armhole" 
+                                               widget="float" 
+                                               placeholder="cm"/>
+                                        <field name="back_length" 
+                                               widget="float" 
+                                               placeholder="cm"/>
+                                        <field name="front_length" 
+                                               widget="float" 
+                                               placeholder="cm"/>
+                                    </group>
+                                </group>
+                                <separator string="Special Instructions"/>
+                                <field name="special_instructions" 
+                                       placeholder="Enter any special requests, design details, or customization notes..."/>
+                            </page>
+
+                            <!-- Financial Tab -->
+                            <page string="Financial" name="financial">
+                                <group>
+                                    <group string="Payment Details">
+                                        <field name="currency_id" invisible="1"/>
+                                        <field name="total_amount" 
+                                               widget="monetary" 
+                                               options="{'currency_field': 'currency_id'}"/>
+                                        <field name="advance_paid" 
+                                               widget="monetary" 
+                                               options="{'currency_field': 'currency_id'}"/>
+                                        <field name="balance_due" 
+                                               widget="monetary" 
+                                               options="{'currency_field': 'currency_id'}" 
+                                               class="oe_subtotal_footer_separator"/>
+                                    </group>
+                                    <group string="Payment Status">
+                                        <field name="balance_due" 
+                                               widget="monetary" 
+                                               options="{'currency_field': 'currency_id'}" 
+                                               invisible="1"/>
+                                        <div class="alert alert-success" 
+                                             role="alert" 
+                                             attrs="{'invisible': [('balance_due', '>', 0)]}">
+                                            <strong>✓ Paid in Full</strong>
+                                        </div>
+                                        <div class="alert alert-warning" 
+                                             role="alert" 
+                                             attrs="{'invisible': [('balance_due', '=', 0)]}">
+                                            <strong>⚠ Balance Due: </strong>
+                                            <field name="balance_due" 
+                                                   widget="monetary" 
+                                                   options="{'currency_field': 'currency_id'}" 
+                                                   nolabel="1"/>
+                                        </div>
+                                    </group>
+                                </group>
+                            </page>
+
+                            <!-- Attachments Tab -->
+                            <page string="Attachments" name="attachments">
+                                <field name="attachment_ids" widget="many2many_binary" 
+                                       string="Design References, Measurements Photos, etc."/>
+                            </page>
+
+                            <!-- Notifications Tab -->
+                            <page string="Notifications" name="notifications">
+                                <group>
+                                    <group string="Notification Settings">
+                                        <field name="send_email_notifications" 
+                                               widget="boolean_toggle"/>
+                                        <field name="send_sms_notifications" 
+                                               widget="boolean_toggle"/>
+                                    </group>
+                                    <group string="Test Notifications">
+                                        <button name="action_send_test_email" 
+                                                string="Send Test Email" 
+                                                type="object" 
+                                                class="btn-primary" 
+                                                icon="fa-envelope"
+                                                attrs="{'invisible': [('customer_email', '=', False)]}"/>
+                                        <button name="action_send_test_sms" 
+                                                string="Send Test SMS" 
+                                                type="object" 
+                                                class="btn-primary" 
+                                                icon="fa-mobile"
+                                                attrs="{'invisible': [('customer_phone', '=', False)]}"/>
+                                    </group>
+                                </group>
+                                <separator string="Notification History"/>
+                                <group>
+                                    <div class="alert alert-info">
+                                        <p><strong>Automatic Notifications:</strong></p>
+                                        <ul>
+                                            <li>✓ Order Received - When order is confirmed</li>
+                                            <li>✓ Measurement - When measurement stage starts</li>
+                                            <li>✓ Production Updates - During cutting, sewing, finishing</li>
+                                            <li>✓ Quality Check - When QC is performed</li>
+                                            <li>✓ Ready for Delivery - When order is ready</li>
+                                            <li>✓ Delivered - When order is completed</li>
+                                        </ul>
+                                        <p><em>Check the chatter below for notification logs.</em></p>
+                                    </div>
+                                </group>
+                            </page>
+                        </notebook>
+                    </sheet>
+
+                    <!-- Chatter -->
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="activity_ids" widget="mail_activity"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <!-- =========================================== -->
+        <!-- KANBAN VIEW -->
+        <!-- =========================================== -->
+        <record id="view_tailor_order_kanban" model="ir.ui.view">
+            <field name="name">tailor.order.kanban</field>
+            <field name="model">tailor.order</field>
+            <field name="arch" type="xml">
+                <kanban default_group_by="status" class="o_kanban_mobile" quick_create="false">
+                    <field name="name"/>
+                    <field name="customer_id"/>
+                    <field name="status"/>
+                    <field name="garment_type"/>
+                    <field name="total_amount"/>
+                    <field name="currency_id"/>
+                    <field name="order_date"/>
+                    <field name="delivery_date"/>
+                    <field name="color"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div class="oe_kanban_global_click">
+                                <div class="oe_kanban_content">
+                                    <div class="o_kanban_record_top">
+                                        <div class="o_kanban_record_headings">
+                                            <strong class="o_kanban_record_title">
+                                                <field name="name"/>
+                                            </strong>
+                                            <br/>
+                                            <span class="o_kanban_record_subtitle">
+                                                <field name="customer_id"/>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="o_kanban_record_body">
+                                        <field name="garment_type"/>
+                                        <t t-if="record.fabric_type.raw_value">
+                                            - <field name="fabric_type"/>
+                                        </t>
+                                        <br/>
+                                        <span class="badge badge-pill badge-info">
+                                            <i class="fa fa-calendar"/> 
+                                            <field name="order_date"/>
+                                        </span>
+                                    </div>
+                                    <div class="o_kanban_record_bottom">
+                                        <div class="oe_kanban_bottom_left">
+                                            <strong>
+                                                <field name="total_amount" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                            </strong>
+                                        </div>
+                                        <div class="oe_kanban_bottom_right">
+                                            <field name="status" widget="label_selection" 
+                                                   options="{'classes': {'draft': 'secondary', 'received': 'primary', 
+                                                   'measurement': 'info', 'cutting': 'warning', 'sewing': 'warning', 
+                                                   'finishing': 'warning', 'quality_check': 'dark', 'ready': 'success', 
+                                                   'delivered': 'success', 'cancelled': 'danger'}}"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+        <!-- =========================================== -->
+        <!-- SEARCH VIEW -->
+        <!-- =========================================== -->
+        <record id="view_tailor_order_search" model="ir.ui.view">
+            <field name="name">tailor.order.search</field>
+            <field name="model">tailor.order</field>
+            <field name="arch" type="xml">
+                <search string="Search Tailor Orders">
+                    <!-- Search Fields -->
+                    <field name="name" string="Order Reference" filter_domain="[('name','ilike',self)]"/>
+                    <field name="customer_id" string="Customer" filter_domain="[('customer_id','ilike',self)]"/>
+                    <field name="garment_type" string="Garment Type"/>
+                    <field name="fabric_type" string="Fabric"/>
+                    <field name="salesperson_id" string="Salesperson"/>
+                    <field name="tailor_id" string="Tailor"/>
+                    
+                    <!-- Filters -->
+                    <separator/>
+                    <filter string="Today's Orders" name="today" 
+                            domain="[('order_date','&gt;=', datetime.datetime.combine(context_today(), datetime.time(0,0,0))),
+                                     ('order_date','&lt;=', datetime.datetime.combine(context_today(), datetime.time(23,59,59)))]"/>
+                    <filter string="This Week" name="this_week" 
+                            domain="[('order_date','&gt;=', (context_today() - datetime.timedelta(days=context_today().weekday())).strftime('%Y-%m-%d')),
+                                     ('order_date','&lt;=', (context_today() + datetime.timedelta(days=6-context_today().weekday())).strftime('%Y-%m-%d'))]"/>
+                    <filter string="This Month" name="this_month" 
+                            domain="[('order_date','&gt;=', context_today().strftime('%Y-%m-01'))]"/>
+                    
+                    <separator/>
+                    <filter string="Draft" name="draft" domain="[('status','=','draft')]"/>
+                    <filter string="Received" name="received" domain="[('status','=','received')]"/>
+                    <filter string="In Measurement" name="measurement" domain="[('status','=','measurement')]"/>
+                    <filter string="In Production" name="production" 
+                            domain="[('status','in',['cutting','sewing','finishing'])]"/>
+                    <filter string="Quality Check" name="quality" domain="[('status','=','quality_check')]"/>
+                    <filter string="Ready for Delivery" name="ready" domain="[('status','=','ready')]"/>
+                    <filter string="Delivered" name="delivered" domain="[('status','=','delivered')]"/>
+                    <filter string="Cancelled" name="cancelled" domain="[('status','=','cancelled')]"/>
+                    
+                    <separator/>
+                    <filter string="Late Delivery" name="late" 
+                            domain="[('delivery_date','&lt;',context_today()),
+                                     ('status','not in',['delivered','cancelled'])]"/>
+                    <filter string="Due Today" name="due_today" 
+                            domain="[('delivery_date','=',context_today())]"/>
+                    <filter string="Due This Week" name="due_week" 
+                            domain="[('delivery_date','&gt;=',context_today()),
+                                     ('delivery_date','&lt;=',(context_today()+datetime.timedelta(days=7)).strftime('%Y-%m-%d'))]"/>
+                    
+                    <separator/>
+                    <filter string="Has Balance Due" name="balance_due" 
+                            domain="[('balance_due','>',0)]"/>
+                    <filter string="Paid in Full" name="paid_full" 
+                            domain="[('balance_due','=',0)]"/>
+                    
+                    <!-- Group By -->
+                    <group expand="0" string="Group By">
+                        <filter string="Status" name="group_status" context="{'group_by':'status'}"/>
+                        <filter string="Customer" name="group_customer" context="{'group_by':'customer_id'}"/>
+                        <filter string="Garment Type" name="group_garment" context="{'group_by':'garment_type'}"/>
+                        <filter string="Salesperson" name="group_salesperson" context="{'group_by':'salesperson_id'}"/>
+                        <filter string="Tailor" name="group_tailor" context="{'group_by':'tailor_id'}"/>
+                        <filter string="Order Date" name="group_order_date" context="{'group_by':'order_date:month'}"/>
+                        <filter string="Delivery Date" name="group_delivery_date" context="{'group_by':'delivery_date:month'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- =========================================== -->
+        <!-- CALENDAR VIEW -->
+        <!-- =========================================== -->
+        <record id="view_tailor_order_calendar" model="ir.ui.view">
+            <field name="name">tailor.order.calendar</field>
+            <field name="model">tailor.order</field>
+            <field name="arch" type="xml">
+                <calendar string="Delivery Schedule" date_start="delivery_date" 
+                          color="status" mode="month" quick_add="False">
+                    <field name="customer_id"/>
+                    <field name="name"/>
+                    <field name="garment_type"/>
+                    <field name="status"/>
+                </calendar>
+            </field>
+        </record>
+
+        <!-- =========================================== -->
+        <!-- PIVOT VIEW (for reporting) -->
+        <!-- =========================================== -->
+        <record id="view_tailor_order_pivot" model="ir.ui.view">
+            <field name="name">tailor.order.pivot</field>
+            <field name="model">tailor.order</field>
+            <field name="arch" type="xml">
+                <pivot string="Orders Analysis">
+                    <field name="order_date" type="row" interval="month"/>
+                    <field name="status" type="col"/>
+                    <field name="total_amount" type="measure"/>
+                </pivot>
+            </field>
+        </record>
+
+        <!-- =========================================== -->
+        <!-- GRAPH VIEW (for reporting) -->
+        <!-- =========================================== -->
+        <record id="view_tailor_order_graph" model="ir.ui.view">
+            <field name="name">tailor.order.graph</field>
+            <field name="model">tailor.order</field>
+            <field name="arch" type="xml">
+                <graph string="Orders Statistics" type="bar">
+                    <field name="order_date" interval="month"/>
+                    <field name="total_amount" type="measure"/>
+                </graph>
+            </field>
+        </record>
+
+        <!-- =========================================== -->
+        <!-- ACTIONS -->
+        <!-- =========================================== -->
+        <record id="action_tailor_orders" model="ir.actions.act_window">
+            <field name="name">Tailor Orders</field>
+            <field name="res_model">tailor.order</field>
+            <field name="view_mode">kanban,tree,form,calendar,pivot,graph</field>
+            <field name="search_view_id" ref="view_tailor_order_search"/>
+            <field name="context">{
+                'default_status': 'draft',
+                'search_default_today': 1
+            }</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create your first tailor order
+                </p>
+                <p>
+                    Click the create button to start a new tailoring order.
+                </p>
+            </field>
+        </record>
+
+        <!-- Quick Actions for different views -->
+        <record id="action_tailor_orders_ready" model="ir.actions.act_window">
+            <field name="name">Ready for Delivery</field>
+            <field name="res_model">tailor.order</field>
+            <field name="view_mode">tree,form,kanban</field>
+            <field name="domain">[('status', '=', 'ready')]</field>
+            <field name="context">{'search_default_ready': 1}</field>
+        </record>
+
+        <record id="action_tailor_orders_production" model="ir.actions.act_window">
+            <field name="name">In Production</field>
+            <field name="res_model">tailor.order</field>
+            <field name="view_mode">kanban,tree,form</field>
+            <field name="domain">[('status', 'in', ['cutting', 'sewing', 'finishing'])]</field>
+            <field name="context">{'search_default_production': 1}</field>
+        </record>
+
+        <!-- =========================================== -->
+        <!-- MENUS -->
+        <!-- =========================================== -->
+        <menuitem id="menu_tailor_root" 
+                  name="Tailor Management" 
+                  sequence="10" 
+                  web_icon="tailor_management,static/description/icon.png"/>
+        
+        <menuitem id="menu_tailor_orders" 
+                  name="Orders" 
+                  parent="menu_tailor_root" 
+                  sequence="10"/>
+        
+        <menuitem id="menu_tailor_orders_all" 
+                  name="All Orders" 
+                  parent="menu_tailor_orders" 
+                  action="action_tailor_orders" 
+                  sequence="10"/>
+        
+        <menuitem id="menu_tailor_orders_ready" 
+                  name="Ready for Delivery" 
+                  parent="menu_tailor_orders" 
+                  action="action_tailor_orders_ready" 
+                  sequence="20"/>
+        
+        <menuitem id="menu_tailor_orders_production" 
+                  name="In Production" 
+                  parent="menu_tailor_orders" 
+                  action="action_tailor_orders_production" 
+                  sequence="30"/>
+
+        <!-- Reports Menu (for future expansion) -->
+        <menuitem id="menu_tailor_reports" 
+                  name="Reports" 
+                  parent="menu_tailor_root" 
+                  sequence="90"/>
+
+    </data>
+</odoo>
