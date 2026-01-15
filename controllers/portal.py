@@ -1,109 +1,65 @@
 # -*- coding: utf-8 -*-
-from odoo import http
+from odoo import http, _
 from odoo.http import request
 from odoo.addons.portal.controllers.portal import CustomerPortal, pager as portal_pager
+from odoo.osv import expression
+
 
 class TailorPortal(CustomerPortal):
-    
+
     def _prepare_home_portal_values(self, counters):
-        """Add tailor orders count to portal home"""
-        values = super()._prepare_home_portal_values(counters)
-        partner = request.env.user.partner_id
-        
+        """Add the count of Tailor Orders to the main Portal Home page"""
+        values = super(TailorPortal, self)._prepare_home_portal_values(counters)
         if 'tailor_order_count' in counters:
-            tailor_order_count = request.env['tailor.order'].search_count([
+            partner = request.env.user.partner_id
+            values['tailor_order_count'] = request.env['tailor.order'].search_count([
                 ('customer_id', '=', partner.id)
             ])
-            values['tailor_order_count'] = tailor_order_count
-        
         return values
-    
-    @http.route(['/my/tailor/orders', '/my/tailor/orders/page/<int:page>'], 
-                type='http', auth="user", website=True)
+
+    # 1. LIST VIEW: Shows all orders
+    @http.route(['/my/tailor/orders', '/my/tailor/orders/page/<int:page>'], type='http', auth="user", website=True)
     def portal_my_orders(self, page=1, sortby=None, filterby=None, **kw):
-        """Customer portal orders list page"""
+        values = self._prepare_portal_layout_values()
         partner = request.env.user.partner_id
         TailorOrder = request.env['tailor.order']
-        
-        # Domain for current customer's orders
+
         domain = [('customer_id', '=', partner.id)]
-        
-        # Filters
-        searchbar_filters = {
-            'all': {'label': 'All', 'domain': []},
-            'active': {'label': 'Active', 'domain': [('status', 'not in', ['delivered', 'cancelled'])]},
-            'production': {'label': 'In Production', 'domain': [('status', 'in', ['cutting', 'sewing', 'finishing'])]},
-            'ready': {'label': 'Ready', 'domain': [('status', '=', 'ready')]},
-            'delivered': {'label': 'Delivered', 'domain': [('status', '=', 'delivered')]},
-        }
-        
-        if not filterby:
-            filterby = 'all'
-        domain += searchbar_filters[filterby]['domain']
-        
-        # Sorting
-        searchbar_sortings = {
-            'date': {'label': 'Order Date', 'order': 'order_date desc'},
-            'name': {'label': 'Reference', 'order': 'name'},
-            'status': {'label': 'Status', 'order': 'status'},
-        }
-        
-        if not sortby:
-            sortby = 'date'
-        order = searchbar_sortings[sortby]['order']
-        
-        # Count orders
+
+        # Count total for pagination
         order_count = TailorOrder.search_count(domain)
-        
-        # Pager
+
+        # Pager configuration
         pager = portal_pager(
             url="/my/tailor/orders",
-            url_args={'sortby': sortby, 'filterby': filterby},
             total=order_count,
             page=page,
-            step=self._items_per_page
+            step=10
         )
-        
-        # Get orders
-        orders = TailorOrder.search(domain, order=order, limit=self._items_per_page, offset=pager['offset'])
-        
-        # Order statistics
-        all_orders = TailorOrder.search([('customer_id', '=', partner.id)])
-        orders_in_production = all_orders.filtered(
-            lambda o: o.status in ['cutting', 'sewing', 'finishing']
-        )
-        orders_ready = all_orders.filtered(lambda o: o.status == 'ready')
-        orders_delivered = all_orders.filtered(lambda o: o.status == 'delivered')
-        
-        values = {
+
+        # Get the orders
+        orders = TailorOrder.search(domain, order='create_date desc', limit=10, offset=pager['offset'])
+
+        values.update({
             'orders': orders,
             'page_name': 'tailor_orders',
             'pager': pager,
             'default_url': '/my/tailor/orders',
-            'searchbar_sortings': searchbar_sortings,
-            'searchbar_filters': searchbar_filters,
-            'sortby': sortby,
-            'filterby': filterby,
-            'total_orders': len(all_orders),
-            'orders_in_production': len(orders_in_production),
-            'orders_ready': len(orders_ready),
-            'orders_delivered': len(orders_delivered),
-        }
+        })
         return request.render("tailor_management.portal_my_tailor_orders", values)
-    
-    @http.route(['/my/tailor/orders/<int:order_id>'], 
-                type='http', auth="user", website=True)
+
+    # 2. DETAIL VIEW: Shows one specific order
+    @http.route(['/my/tailor/orders/<int:order_id>'], type='http', auth="user", website=True)
     def portal_my_order_detail(self, order_id, access_token=None, **kw):
-        """Customer portal order detail page"""
-        try:
-            order_sudo = self._document_check_access('tailor.order', order_id, access_token)
-        except Exception:
-            return request.redirect('/my')
-        
-        # Check if order belongs to current user
-        if order_sudo.customer_id != request.env.user.partner_id:
-            return request.redirect('/my')
-        
+        # Securely fetch order (ensure user owns it)
+        order_sudo = request.env['tailor.order'].sudo().search([
+            ('id', '=', order_id),
+            ('customer_id', '=', request.env.user.partner_id.id)
+        ], limit=1)
+
+        if not order_sudo:
+            return request.redirect('/my/tailor/orders')
+
         values = {
             'order': order_sudo,
             'page_name': 'tailor_order',

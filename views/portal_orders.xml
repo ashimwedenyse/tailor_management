@@ -1,23 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-
-        <!-- =========================================== -->
-        <!-- PORTAL HOME EXTENSION -->
-        <!-- =========================================== -->
-        <template id="portal_my_home_menu_tailor" name="Portal layout : tailor orders menu entry" inherit_id="portal.portal_breadcrumbs" priority="40">
-            <xpath expr="//ol[hasclass('o_portal_submenu')]" position="inside">
-                <li t-if="page_name == 'tailor_orders' or page_name == 'tailor_order'" class="col-lg-2" t-attf-class="breadcrumb-item #{'active ' if not order else ''}">
-                    <a t-if="order" href="/my/tailor/orders">Tailor Orders</a>
-                    <t t-else="">Tailor Orders</t>
-                </li>
-                <li t-if="order" class="breadcrumb-item active">
-                    <t t-esc="order.name"/>
-                </li>
-            </xpath>
-        </template>
-
-        <template id="portal_my_home_tailor" name="Portal My Home : tailor entries" customize_show="True" inherit_id="portal.portal_my_home" priority="40">
+        <template id="portal_my_home_tailor" name="Show Tailor Orders" inherit_id="portal.portal_my_home" priority="30">
             <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
                 <t t-call="portal.portal_docs_entry">
                     <t t-set="title">Tailor Orders</t>
@@ -27,276 +11,109 @@
             </xpath>
         </template>
 
-        <!-- =========================================== -->
-        <!-- PORTAL ORDERS LIST -->
-        <!-- =========================================== -->
+        <template id="portal_my_home_menu_tailor" name="Portal layout : tailor menu entries" inherit_id="portal.portal_breadcrumbs" priority="30">
+            <xpath expr="//ol[hasclass('o_portal_submenu')]" position="inside">
+                <li t-if="page_name == 'tailor_orders' or page_name == 'tailor_order'" t-attf-class="breadcrumb-item #{'active' if not order else ''}">
+                    <a t-if="order" t-attf-href="/my/tailor/orders">Tailor Orders</a>
+                    <t t-else="">Tailor Orders</t>
+                </li>
+                <li t-if="order" class="breadcrumb-item active">
+                    <t t-esc="order.name"/>
+                </li>
+            </xpath>
+        </template>
+
         <template id="portal_my_tailor_orders" name="My Tailor Orders">
             <t t-call="portal.portal_layout">
                 <t t-set="breadcrumbs_searchbar" t-value="True"/>
-
                 <t t-call="portal.portal_searchbar">
-                    <t t-set="title">Orders</t>
+                    <t t-set="title">Tailor Orders</t>
                 </t>
 
-                <div class="container mt-3">
-                    <!-- Page Header -->
-                    <div class="row mb-4">
-                        <div class="col-md-8">
-                            <h2 class="mb-0">My Tailoring Orders</h2>
-                            <p class="text-muted">Track the progress of your tailoring orders</p>
-                        </div>
-                        <div class="col-md-4 text-end">
-                            <button type="button" class="btn btn-outline-secondary" onclick="window.print()">
-                                <i class="fa fa-print me-1"></i>Print
-                            </button>
-                        </div>
+                <t t-if="not orders">
+                    <div class="alert alert-warning">
+                        There are currently no orders for your account.
                     </div>
+                </t>
 
-                    <!-- Orders Table -->
-                    <t t-if="not orders">
-                        <div class="alert alert-info text-center" role="alert">
-                            <p class="mb-0">
-                                <i class="fa fa-inbox fa-3x mb-3 d-block"></i>
-                                <strong>No orders found</strong><br/>
-                                You haven't placed any tailoring orders yet.
-                            </p>
-                        </div>
-                    </t>
-
-                    <t t-if="orders" t-call="portal.portal_table">
-                        <thead>
-                            <tr class="active">
-                                <th>Order #</th>
+                <div t-if="orders" class="table-responsive bg-white">
+                    <table class="table table-hover">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Reference</th>
                                 <th>Date</th>
                                 <th>Garment</th>
                                 <th>Status</th>
                                 <th class="text-end">Amount</th>
-                                <th class="text-center">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             <t t-foreach="orders" t-as="order">
                                 <tr>
                                     <td>
-                                        <a t-att-href="'/my/tailor/orders/%s' % order.id">
+                                        <a t-attf-href="/my/tailor/orders/#{order.id}">
                                             <t t-esc="order.name"/>
                                         </a>
                                     </td>
+                                    <td><span t-field="order.order_date" t-options='{"widget": "date"}'/></td>
+                                    <td><span t-field="order.garment_type"/></td>
                                     <td>
-                                        <span t-field="order.order_date" t-options='{"widget": "date"}'/>
-                                    </td>
-                                    <td>
-                                        <t t-esc="order.garment_type.title()"/>
-                                        <t t-if="order.fabric_type">
-                                            <small class="text-muted d-block">
-                                                <t t-esc="order.fabric_type"/>
-                                            </small>
-                                        </t>
-                                    </td>
-                                    <td>
-                                        <span t-attf-class="badge rounded-pill bg-#{
-                                            'secondary' if order.status == 'draft' else
-                                            'primary' if order.status == 'received' else
-                                            'info' if order.status == 'measurement' else
-                                            'warning' if order.status in ['cutting','sewing','finishing'] else
-                                            'dark' if order.status == 'quality_check' else
-                                            'success' if order.status in ['ready','delivered'] else
-                                            'danger' if order.status == 'cancelled' else
-                                            'secondary'
-                                        }">
-                                            <t t-esc="order.status.replace('_', ' ').title()"/>
-                                        </span>
+                                        <span t-if="order.status == 'ready'" class="badge rounded-pill text-bg-success">Ready</span>
+                                        <span t-elif="order.status in ['cutting', 'sewing']" class="badge rounded-pill text-bg-warning">In Progress</span>
+                                        <span t-else="" class="badge rounded-pill text-bg-secondary"><span t-field="order.status"/></span>
                                     </td>
                                     <td class="text-end">
                                         <span t-field="order.total_amount" t-options='{"widget": "monetary", "display_currency": order.currency_id}'/>
-                                    </td>
-                                    <td class="text-center">
-                                        <a t-att-href="'/my/tailor/orders/%s' % order.id" 
-                                           class="btn btn-sm btn-primary">
-                                            <i class="fa fa-eye"></i> View
-                                        </a>
                                     </td>
                                 </tr>
                             </t>
                         </tbody>
-                    </t>
-
-                    <!-- Order Statistics -->
-                    <div class="row mt-5">
-                        <div class="col-lg-3 col-md-6 mb-3">
-                            <div class="card border-primary h-100">
-                                <div class="card-body text-center">
-                                    <h3 class="card-title text-primary"><t t-esc="total_orders"/></h3>
-                                    <p class="card-text text-muted mb-0">Total Orders</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-3 col-md-6 mb-3">
-                            <div class="card border-warning h-100">
-                                <div class="card-body text-center">
-                                    <h3 class="card-title text-warning"><t t-esc="orders_in_production"/></h3>
-                                    <p class="card-text text-muted mb-0">In Production</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-3 col-md-6 mb-3">
-                            <div class="card border-success h-100">
-                                <div class="card-body text-center">
-                                    <h3 class="card-title text-success"><t t-esc="orders_ready"/></h3>
-                                    <p class="card-text text-muted mb-0">Ready for Pickup</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-3 col-md-6 mb-3">
-                            <div class="card border-info h-100">
-                                <div class="card-body text-center">
-                                    <h3 class="card-title text-info"><t t-esc="orders_delivered"/></h3>
-                                    <p class="card-text text-muted mb-0">Delivered</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
+                    </table>
                 </div>
             </t>
         </template>
 
-        <!-- =========================================== -->
-        <!-- PORTAL ORDER DETAIL -->
-        <!-- =========================================== -->
-        <template id="portal_my_tailor_order_detail" name="My Tailor Order Detail">
+        <template id="portal_my_tailor_order_detail" name="Tailor Order Detail">
             <t t-call="portal.portal_layout">
-                <t t-set="o_portal_fullwidth_alert" groups="base.group_portal">
-                    <t t-call="portal.portal_back_in_edit_mode">
-                        <t t-set="backend_url" t-value="'/web#model=tailor.order&amp;id=%s&amp;view_type=form' % order.id"/>
-                    </t>
-                </t>
-
-                <div class="container mt-3">
-                    <!-- Order Header -->
-                    <div class="card mb-4">
-                        <div class="card-header bg-primary text-white">
-                            <div class="row align-items-center">
-                                <div class="col-md-8">
-                                    <h3 class="mb-0">
-                                        <i class="fa fa-scissors me-2"></i>Order <t t-esc="order.name"/>
-                                    </h3>
-                                </div>
-                                <div class="col-md-4 text-end">
-                                    <span t-attf-class="badge bg-#{
-                                        'secondary' if order.status == 'draft' else
-                                        'primary' if order.status == 'received' else
-                                        'info' if order.status == 'measurement' else
-                                        'warning' if order.status in ['cutting','sewing','finishing'] else
-                                        'dark' if order.status == 'quality_check' else
-                                        'success' if order.status in ['ready','delivered'] else
-                                        'danger' if order.status == 'cancelled' else
-                                        'secondary'
-                                    }" style="font-size: 1.1rem; padding: 8px 15px;">
-                                        <t t-esc="order.status.replace('_', ' ').title()"/>
-                                    </span>
-                                </div>
-                            </div>
+                <div class="container bg-white p-4 shadow-sm rounded mt-3">
+                    <div class="row">
+                        <div class="col-8">
+                            <h2>Order <span t-field="order.name"/></h2>
                         </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <p><strong>Order Date:</strong> <span t-field="order.order_date" t-options='{"widget": "datetime"}'/></p>
-                                    <p><strong>Customer:</strong> <t t-esc="order.customer_id.name"/></p>
-                                    <p t-if="order.delivery_date"><strong>Expected Delivery:</strong> <span t-field="order.delivery_date" t-options='{"widget": "date"}'/></p>
-                                </div>
-                                <div class="col-md-6">
-                                    <p><strong>Garment Type:</strong> <t t-esc="order.garment_type.title()"/></p>
-                                    <p t-if="order.fabric_type"><strong>Fabric:</strong> <t t-esc="order.fabric_type"/></p>
-                                    <p t-if="order.color"><strong>Color:</strong> <t t-esc="order.color"/></p>
-                                </div>
-                            </div>
+                        <div class="col-4 text-end">
+                            <span t-field="order.status" class="badge rounded-pill text-bg-primary" style="font-size:16px;"/>
+                        </div>
+                    </div>
+                    <hr/>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <strong>Garment Type:</strong> <span t-field="order.garment_type"/><br/>
+                            <strong>Fabric:</strong> <span t-field="order.fabric_type"/><br/>
+                            <strong>Date:</strong> <span t-field="order.order_date"/>
+                        </div>
+                        <div class="col-md-6 text-end">
+                            <strong>Total:</strong> <span t-field="order.total_amount"/><br/>
+                            <strong>Balance Due:</strong> <span t-field="order.balance_due" class="text-danger fw-bold"/>
                         </div>
                     </div>
 
-                    <!-- Measurements -->
-                    <div class="card mb-4">
-                        <div class="card-header">
-                            <h4 class="mb-0"><i class="fa fa-ruler me-2"></i>Measurements</h4>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-4" t-if="order.chest_measurement">
-                                    <p><strong>Chest:</strong> <t t-esc="order.chest_measurement"/> cm</p>
-                                </div>
-                                <div class="col-md-4" t-if="order.waist_measurement">
-                                    <p><strong>Waist:</strong> <t t-esc="order.waist_measurement"/> cm</p>
-                                </div>
-                                <div class="col-md-4" t-if="order.hip_measurement">
-                                    <p><strong>Hip:</strong> <t t-esc="order.hip_measurement"/> cm</p>
-                                </div>
-                                <div class="col-md-4" t-if="order.shoulder_width">
-                                    <p><strong>Shoulder Width:</strong> <t t-esc="order.shoulder_width"/> cm</p>
-                                </div>
-                                <div class="col-md-4" t-if="order.sleeve_length">
-                                    <p><strong>Sleeve Length:</strong> <t t-esc="order.sleeve_length"/> cm</p>
-                                </div>
-                                <div class="col-md-4" t-if="order.armhole">
-                                    <p><strong>Armhole:</strong> <t t-esc="order.armhole"/> cm</p>
-                                </div>
-                            </div>
-                            <t t-if="not (order.chest_measurement or order.waist_measurement or order.hip_measurement)">
-                                <p class="text-muted">Measurements will be added after your appointment.</p>
-                            </t>
-                        </div>
-                    </div>
-
-                    <!-- Special Instructions -->
-                    <div class="card mb-4" t-if="order.special_instructions">
-                        <div class="card-header">
-                            <h4 class="mb-0"><i class="fa fa-comment me-2"></i>Special Instructions</h4>
-                        </div>
-                        <div class="card-body">
-                            <p t-field="order.special_instructions"/>
-                        </div>
-                    </div>
-
-                    <!-- Financial Details -->
-                    <div class="card mb-4">
-                        <div class="card-header">
-                            <h4 class="mb-0"><i class="fa fa-money me-2"></i>Payment Details</h4>
-                        </div>
-                        <div class="card-body">
-                            <table class="table table-borderless">
-                                <tr>
-                                    <td><strong>Total Amount:</strong></td>
-                                    <td class="text-end">
-                                        <span t-field="order.total_amount" t-options='{"widget": "monetary", "display_currency": order.currency_id}'/>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Advance Paid:</strong></td>
-                                    <td class="text-end">
-                                        <span t-field="order.advance_paid" t-options='{"widget": "monetary", "display_currency": order.currency_id}'/>
-                                    </td>
-                                </tr>
-                                <tr class="table-warning">
-                                    <td><strong>Balance Due:</strong></td>
-                                    <td class="text-end">
-                                        <strong>
-                                            <span t-field="order.balance_due" t-options='{"widget": "monetary", "display_currency": order.currency_id}'/>
-                                        </strong>
-                                    </td>
-                                </tr>
-                            </table>
-                        </div>
-                    </div>
-
-                    <!-- Back Button -->
-                    <div class="text-center mb-4">
-                        <a href="/my/tailor/orders" class="btn btn-secondary">
-                            <i class="fa fa-arrow-left me-1"></i>Back to Orders
-                        </a>
-                    </div>
-
+                    <h4 class="mt-4">Measurements</h4>
+                    <table class="table table-bordered table-sm mt-2">
+                        <tbody>
+                            <tr>
+                                <td><strong>Chest:</strong> <span t-field="order.chest_measurement"/></td>
+                                <td><strong>Waist:</strong> <span t-field="order.waist_measurement"/></td>
+                                <td><strong>Hip:</strong> <span t-field="order.hip_measurement"/></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Shoulder:</strong> <span t-field="order.shoulder_width"/></td>
+                                <td><strong>Sleeve:</strong> <span t-field="order.sleeve_length"/></td>
+                                <td><strong>Length:</strong> <span t-field="order.front_length"/></td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </t>
         </template>
-
     </data>
 </odoo>

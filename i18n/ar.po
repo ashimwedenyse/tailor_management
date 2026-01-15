@@ -1,0 +1,912 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* tailor_management
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-12 08:47+0000\n"
+"PO-Revision-Date: 2026-01-12 08:47+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: tailor_management
+#: model_terms:ir.ui.view,arch_db:tailor_management.portal_my_tailor_order_detail
+msgid ""
+"<br/>\n"
+"                            <strong>Balance Due:</strong>"
+msgstr ""
+"<br/>\n"
+"                            <strong>الرصيد المستحق:</strong>"
+
+#. module: tailor_management
+#: model_terms:ir.ui.view,arch_db:tailor_management.portal_my_tailor_order_detail
+msgid ""
+"<br/>\n"
+"                            <strong>Date:</strong>"
+msgstr ""
+"<br/>\n"
+"                            <strong>التاريخ:</strong>"
+
+#. module: tailor_management
+#: model_terms:ir.ui.view,arch_db:tailor_management.portal_my_tailor_order_detail
+msgid ""
+"<br/>\n"
+"                            <strong>Fabric:</strong>"
+msgstr ""
+"<br/>\n"
+"                            <strong>القماش:</strong>"
+
+#. module: tailor_management
+#: model:mail.template,body_html:tailor_management.email_template_ready
+msgid ""
+"<div style=\"font-family:Arial,sans-serif;\">\n"
+"                    <p>Hello <t t-out=\"object.customer_id.name or 'Customer'\"/>,</p>\n"
+"                    <p>Great news! Your order <b><t t-out=\"object.name\"/></b> is complete and ready for pickup.</p>\n"
+"                    <p style=\"font-size:16px;\">Balance due: <b><t t-out=\"object.balance_due\"/> <t t-out=\"object.currency_id.symbol\"/></b></p>\n"
+"                </div>\n"
+"            "
+msgstr ""
+"<div style=\"font-family:Arial,sans-serif;\">\n"
+"                    <p>مرحباً <t t-out=\"object.customer_id.name or 'عميلنا'\"/>،</p>\n"
+"                    <p>أخبار رائعة! طلبك <b><t t-out=\"object.name\"/></b> مكتمل وجاهز للاستلام.</p>\n"
+"                    <p style=\"font-size:16px;\">الرصيد المستحق: <b><t t-out=\"object.balance_due\"/> <t t-out=\"object.currency_id.symbol\"/></b></p>\n"
+"                </div>\n"
+"            "
+
+#. module: tailor_management
+#: model:mail.template,body_html:tailor_management.email_template_measurement
+msgid ""
+"<div style=\"font-family:Arial,sans-serif;\">\n"
+"                    <p>Hello <t t-out=\"object.customer_id.name or 'Customer'\"/>,</p>\n"
+"                    <p>It is time to schedule your measurements for order <b><t t-out=\"object.name\"/></b>.</p>\n"
+"                    <p>Please contact us to confirm your availability.</p>\n"
+"                </div>\n"
+"            "
+msgstr ""
+"<div style=\"font-family:Arial,sans-serif;\">\n"
+"                    <p>مرحباً <t t-out=\"object.customer_id.name or 'عميلنا'\"/>،</p>\n"
+"                    <p>حان الوقت لجدولة موعد أخذ القياسات لطلبك <b><t t-out=\"object.name\"/></b>.</p>\n"
+"                    <p>يرجى التواصل معنا لتأكيد موعد يناسبك.</p>\n"
+"                </div>\n"
+"            "
+
+#. module: tailor_management
+#: model:mail.template,body_html:tailor_management.email_template_cancelled
+msgid ""
+"<div style=\"font-family:Arial,sans-serif;\">\n"
+"                    <p>Hello <t t-out=\"object.customer_id.name or 'Customer'\"/>,</p>\n"
+"                    <p>This is to confirm that your order <b><t t-out=\"object.name\"/></b> has been cancelled.</p>\n"
+"                </div>\n"
+"            "
+msgstr ""
+"<div style=\"font-family:Arial,sans-serif;\">\n"
+"                    <p>مرحباً <t t-out=\"object.customer_id.name or 'عميلنا'\"/>،</p>\n"
+"                    <p>نود تأكيد أن طلبك <b><t t-out=\"object.name\"/></b> قد تم إلغاؤه.</p>\n"
+"                </div>\n"
+"            "
+
+#. module: tailor_management
+#: model:mail.template,body_html:tailor_management.email_template_delivered
+msgid ""
+"<div style=\"font-family:Arial,sans-serif;\">\n"
+"                    <p>Hello <t t-out=\"object.customer_id.name or 'Customer'\"/>,</p>\n"
+"                    <p>Your order <b><t t-out=\"object.name\"/></b> has been marked as delivered. We hope you love your garment!</p>\n"
+"                </div>\n"
+"            "
+msgstr ""
+"<div style=\"font-family:Arial,sans-serif;\">\n"
+"                    <p>مرحباً <t t-out=\"object.customer_id.name or 'عميلنا'\"/>،</p>\n"
+"                    <p>تم تسجيل طلبك <b><t t-out=\"object.name\"/></b> كمُسلَّم. نأمل أن تنال القطعة إعجابكم!</p>\n"
+"                </div>\n"
+"            "
+
+#. module: tailor_management
+#: model:mail.template,body_html:tailor_management.email_template_order_received
+msgid ""
+"<div style=\"font-family:Arial,sans-serif;\">\n"
+"                    <p>Hello <t t-out=\"object.customer_id.name or 'Customer'\"/>,</p>\n"
+"                    <p>Your order <b><t t-out=\"object.name\"/></b> has been received and is now in our system.</p>\n"
+"                    <p>Thank you for choosing us!</p>\n"
+"                </div>\n"
+"            "
+msgstr ""
+"<div style=\"font-family:Arial,sans-serif;\">\n"
+"                    <p>مرحباً <t t-out=\"object.customer_id.name or 'عميلنا'\"/>،</p>\n"
+"                    <p>تم استلام طلبك <b><t t-out=\"object.name\"/></b> وهو الآن مسجل في نظامنا.</p>\n"
+"                    <p>شكراً لاختياركم خدماتنا!</p>\n"
+"                </div>\n"
+"            "
+
+#. module: tailor_management
+#: model:mail.template,body_html:tailor_management.email_template_production
+msgid ""
+"<div style=\"font-family:Arial,sans-serif;\">\n"
+"                    <p>Hello <t t-out=\"object.customer_id.name or 'Customer'\"/>,</p>\n"
+"                    <p>Your order <b><t t-out=\"object.name\"/></b> is moving forward! It is now in the <b><t t-out=\"dict(object._fields['status'].selection).get(object.status)\"/></b> stage.</p>\n"
+"                </div>\n"
+"            "
+msgstr ""
+"<div style=\"font-family:Arial,sans-serif;\">\n"
+"                    <p>مرحباً <t t-out=\"object.customer_id.name or 'عميلنا'\"/>،</p>\n"
+"                    <p>طلبك <b><t t-out=\"object.name\"/></b> يتقدم للأمام! هو الآن في مرحلة <b><t t-out=\"dict(object._fields['status'].selection).get(object.status)\"/></b>.</p>\n"
+"                </div>\n"
+"            "
+
+#. module: tailor_management
+#: model_terms:ir.ui.view,arch_db:tailor_management.portal_my_tailor_order_detail
+msgid "<strong>Chest:</strong>"
+msgstr "<strong>الصدر:</strong>"
+
+#. module: tailor_management
+#: model_terms:ir.ui.view,arch_db:tailor_management.portal_my_tailor_order_detail
+msgid "<strong>Garment Type:</strong>"
+msgstr "<strong>نوع القطعة:</strong>"
+
+#. module: tailor_management
+#: model_terms:ir.ui.view,arch_db:tailor_management.portal_my_tailor_order_detail
+msgid "<strong>Hip:</strong>"
+msgstr "<strong>الورك:</strong>"
+
+#. module: tailor_management
+#: model_terms:ir.ui.view,arch_db:tailor_management.portal_my_tailor_order_detail
+msgid "<strong>Length:</strong>"
+msgstr "<strong>الطول:</strong>"
+
+#. module: tailor_management
+#: model_terms:ir.ui.view,arch_db:tailor_management.portal_my_tailor_order_detail
+msgid "<strong>Shoulder:</strong>"
+msgstr "<strong>الكتف:</strong>"
+
+#. module: tailor_management
+#: model_terms:ir.ui.view,arch_db:tailor_management.portal_my_tailor_order_detail
+msgid "<strong>Sleeve:</strong>"
+msgstr "<strong>الكم:</strong>"
+
+#. module: tailor_management
+#: model_terms:ir.ui.view,arch_db:tailor_management.portal_my_tailor_order_detail
+msgid "<strong>Total:</strong>"
+msgstr "<strong>الإجمالي:</strong>"
+
+#. module: tailor_management
+#: model_terms:ir.ui.view,arch_db:tailor_management.portal_my_tailor_order_detail
+msgid "<strong>Waist:</strong>"
+msgstr "<strong>الخصر:</strong>"
+
+#. module: tailor_management
+#: model:ir.model.fields,field_description:tailor_management.field_tailor_order__message_needaction
+msgid "Action Needed"
+msgstr "إجراء مطلوب"
+
+#. module: tailor_management
+#: model:ir.model.fields,field_description:tailor_management.field_tailor_order__activity_ids
+msgid "Activities"
+msgstr "الأنشطة"
+
+#. module: tailor_management
+#: model:ir.model.fields,field_description:tailor_management.field_tailor_order__activity_exception_decoration
+msgid "Activity Exception Decoration"
+msgstr "زخرفة استثناء النشاط"
+
+#. module: tailor_management
+#: model:ir.model.fields,field_description:tailor_management.field_tailor_order__activity_state
+msgid "Activity State"
+msgstr "حالة النشاط"
+
+#. module: tailor_management
+#: model:ir.model.fields,field_description:tailor_management.field_tailor_order__activity_type_icon
+msgid "Activity Type Icon"
+msgstr "أيقونة نوع النشاط"
+
+#. module: tailor_management
+#: model_terms:ir.ui.view,arch_db:tailor_management.view_tailor_order_form
+msgid "Add details here..."
+msgstr "أضف التفاصيل هنا..."
+
+#. module: tailor_management
+#: model:res.groups,name:tailor_management.group_tailor_admin
+msgid "Admin"
+msgstr "مدير"
+
+#. module: tailor_management
+#: model:ir.model.fields,field_description:tailor_management.field_tailor_order__advance_paid
+msgid "Advance Paid"
+msgstr "المبلغ المقدم"
+
+#. module: tailor_management
+#. odoo-python
+#: code:addons/tailor_management/models/tailor_order.py:0
+msgid "Advance cannot be negative"
+msgstr "لا يمكن للمبلغ المقدم أن يكون سالباً"
+
+#. module: tailor_management
+#. odoo-python
+#: code:addons/tailor_management/models/tailor_order.py:0
+msgid "Advance cannot exceed total"
+msgstr "المبلغ المقدم لا يمكن أن يتجاوز الإجمالي"
+
+#. module: tailor_management
+#: model_terms:ir.ui.view,arch_db:tailor_management.portal_my_tailor_orders
+msgid "Amount"
+msgstr "المبلغ"
+
+#. module: tailor_management
+#: model:ir.model.fields,field_description:tailor_management.field_tailor_order__armhole
+msgid "Armhole"
+msgstr "فتحة الذراع"
+
+#. module: tailor_management
+#: model:ir.model.fields,field_description:tailor_management.field_tailor_order__attachment_ids
+msgid "Attachment"
+msgstr "مرفق"
+
+#. module: tailor_management
+#: model:ir.model.fields,field_description:tailor_management.field_tailor_order__message_attachment_count
+msgid "Attachment Count"
+msgstr "عدد المرفقات"
+
+#. module: tailor_management
+#: model:ir.model.fields,field_description:tailor_management.field_tailor_order__back_length
+msgid "Back Length"
+msgstr "طول الظهر"
+
+#. module: tailor_management
+#: model:ir.model.fields,field_description:tailor_management.field_tailor_order__balance_due
+msgid "Balance Due"
+msgstr "الرصيد المستحق"
+
+#. module: tailor_management
+#: model:res.groups,comment:tailor_management.group_tailor_sales
+msgid "Can create and edit orders, but not delete"
+msgstr "يمكن إنشاء وتعديل الطلبات، ولكن لا يمكن حذفها"
+
+#. module: tailor_management
+#: model:res.groups,comment:tailor_management.group_tailor_worker
+msgid "Can view and update orders assigned to them"
+msgstr "يمكن عرض وتحديث الطلبات المسندة إليهم"
+
+#. module: tailor_management
+#: model_terms:ir.ui.view,arch_db:tailor_management.view_tailor_order_form
+msgid "Cancel Order"
+msgstr "إلغاء الطلب"
+
+#. module: tailor_management
+#: model:mail.template,subject:tailor_management.email_template_cancelled
+msgid "Cancellation Notice: {{ object.name }}"
+msgstr "إشعار إلغاء: {{ object.name }}"
+
+#. module: tailor_management
+#: model:ir.model.fields.selection,name:tailor_management.selection__tailor_order__status__cancelled
+msgid "Cancelled"
+msgstr "ملغي"
+
+#. module: tailor_management
+#: model:ir.model.fields,field_description:tailor_management.field_tailor_order__chest_measurement
+msgid "Chest Measurement"
+msgstr "قياس الصدر"
+
+#. module: tailor_management
+#: model:ir.model.fields,field_description:tailor_management.field_tailor_order__color
+msgid "Color"
+msgstr "اللون"
+
+#. module: tailor_management
+#: model:ir.model,name:tailor_management.model_res_partner
+msgid "Contact"
+msgstr "جهة الاتصال"
+
+#. module: tailor_management
+#: model:ir.model.fields,field_description:tailor_management.field_tailor_order__create_uid
+msgid "Created by"
+msgstr "أنشئ بواسطة"
+
+#. module: tailor_management
+#: model:ir.model.fields,field_description:tailor_management.field_tailor_order__create_date
+msgid "Created on"
+msgstr "أنشئ في"
+
+#. module: tailor_management
+#: model:ir.model.fields,field_description:tailor_management.field_tailor_order__currency_id
+msgid "Currency"
+msgstr "العملة"
+
+#. module: tailor_management
+#: model:ir.model.fields,field_description:tailor_management.field_tailor_order__customer_id
+msgid "Customer"
+msgstr "العميل"
+
+#. module: tailor_management
+#: model:ir.model.fields.selection,name:tailor_management.selection__tailor_order__status__cutting
+msgid "Cutting"
+msgstr "قص القماش"
+
+#. module: tailor_management
+#: model_terms:ir.ui.view,arch_db:tailor_management.portal_my_tailor_orders
+msgid "Date"
+msgstr "التاريخ"
+
+#. module: tailor_management
+#: model:ir.model.fields.selection,name:tailor_management.selection__tailor_order__status__delivered
+msgid "Delivered"
+msgstr "تم التسليم"
+
+#. module: tailor_management
+#: model:ir.model.fields,field_description:tailor_management.field_tailor_order__delivery_date
+msgid "Delivery Date"
+msgstr "تاريخ التسليم"
+
+#. module: tailor_management
+#: model:ir.model.fields,field_description:tailor_management.field_res_partner__display_name
+#: model:ir.model.fields,field_description:tailor_management.field_tailor_order__display_name
+msgid "Display Name"
+msgstr "اسم العرض"
+
+#. module: tailor_management
+#: model:ir.model.fields.selection,name:tailor_management.selection__tailor_order__status__draft
+#: model_terms:ir.ui.view,arch_db:tailor_management.view_tailor_order_search
+msgid "Draft"
+msgstr "مسودة"
+
+#. module: tailor_management
+#: model:ir.model.fields,field_description:tailor_management.field_tailor_order__customer_email
+msgid "Email"
+msgstr "البريد الإلكتروني"
+
+#. module: tailor_management
+#: model:ir.model.fields,field_description:tailor_management.field_tailor_order__fabric_type
+msgid "Fabric Type"
+msgstr "نوع القماش"
+
+#. module: tailor_management
+#: model_terms:ir.ui.view,arch_db:tailor_management.view_tailor_order_form
+msgid "Financials"
+msgstr "البيانات المالية"
+
+#. module: tailor_management
+#: model:ir.model.fields.selection,name:tailor_management.selection__tailor_order__status__finishing
+msgid "Finishing"
+msgstr "تشطيب"
+
+#. module: tailor_management
+#: model:ir.model.fields,field_description:tailor_management.field_tailor_order__message_follower_ids
+msgid "Followers"
+msgstr "المتابعون"
+
+#. module: tailor_management
+#: model:ir.model.fields,field_description:tailor_management.field_tailor_order__message_partner_ids
+msgid "Followers (Partners)"
+msgstr "المتابعون (الشركاء)"
+
+#. module: tailor_management
+#: model:ir.model.fields,help:tailor_management.field_tailor_order__activity_type_icon
+msgid "Font awesome icon e.g. fa-tasks"
+msgstr "أيقونة Font awesome مثال fa-tasks"
+
+#. module: tailor_management
+#: model:ir.model.fields,field_description:tailor_management.field_tailor_order__front_length
+msgid "Front Length"
+msgstr "الطول الأمامي"
+
+#. module: tailor_management
+#: model:res.groups,comment:tailor_management.group_tailor_admin
+msgid "Full access to all tailor management features"
+msgstr "صلاحيات كاملة لجميع ميزات إدارة الخياطة"
+
+#. module: tailor_management
+#: model_terms:ir.ui.view,arch_db:tailor_management.portal_my_tailor_orders
+msgid "Garment"
+msgstr "القطعة"
+
+#. module: tailor_management
+#: model:ir.model.fields,field_description:tailor_management.field_tailor_order__garment_type
+msgid "Garment Type"
+msgstr "نوع القطعة"
+
+#. module: tailor_management
+#: model:ir.model.fields,field_description:tailor_management.field_tailor_order__has_message
+msgid "Has Message"
+msgstr "لديه رسالة"
+
+#. module: tailor_management
+#. odoo-python
+#: code:addons/tailor_management/models/tailor_order.py:0
+msgid "Hello %s! Your order %s has been received."
+msgstr "مرحباً %s! تم استلام طلبك %s."
+
+#. module: tailor_management
+#. odoo-python
+#: code:addons/tailor_management/models/tailor_order.py:0
+msgid "Hello %s, Order %s delivered. Thank you!"
+msgstr "مرحباً %s، تم تسليم الطلب %s. شكراً لك!"
+
+#. module: tailor_management
+#. odoo-python
+#: code:addons/tailor_management/models/tailor_order.py:0
+msgid "Hello %s, Order %s has been cancelled."
+msgstr "مرحباً %s، تم إلغاء الطلب %s."
+
+#. module: tailor_management
+#. odoo-python
+#: code:addons/tailor_management/models/tailor_order.py:0
+msgid "Hello %s, Order %s ready! Balance: %.2f %s"
+msgstr "مرحباً %s، الطلب %s جاهز! الرصيد: %.2f %s"
+
+#. module: tailor_management
+#. odoo-python
+#: code:addons/tailor_management/models/tailor_order.py:0
+msgid "Hello %s, order %s is under quality check."
+msgstr "مرحباً %s، الطلب %s تحت فحص الجودة."
+
+#. module: tailor_management
+#. odoo-python
+#: code:addons/tailor_management/models/tailor_order.py:0
+msgid "Hello %s, your order %s is being sewn."
+msgstr "مرحباً %s، يتم خياطة طلبك %s الآن."
+
+#. module: tailor_management
+#. odoo-python
+#: code:addons/tailor_management/models/tailor_order.py:0
+msgid "Hello %s, your order %s is in finishing."
+msgstr "مرحباً %s، طلبك %s في مرحلة التشطيب."
+
+#. module: tailor_management
+#. odoo-python
+#: code:addons/tailor_management/models/tailor_order.py:0
+msgid "Hello %s, your order %s is now in cutting."
+msgstr "مرحباً %s، طلبك %s الآن في مرحلة القص."
+
+#. module: tailor_management
+#. odoo-python
+#: code:addons/tailor_management/models/tailor_order.py:0
+msgid "Hi %s! Measurement scheduled for order %s."
+msgstr "أهلاً %s! تم جدولة موعد القياس للطلب %s."
+
+#. module: tailor_management
+#: model:ir.model.fields,field_description:tailor_management.field_tailor_order__hip_measurement
+msgid "Hip Measurement"
+msgstr "قياس الورك"
+
+#. module: tailor_management
+#: model:ir.model.fields,field_description:tailor_management.field_res_partner__id
+#: model:ir.model.fields,field_description:tailor_management.field_tailor_order__id
+msgid "ID"
+msgstr "المعرف"
+
+#. module: tailor_management
+#: model:ir.model.fields,field_description:tailor_management.field_tailor_order__activity_exception_icon
+msgid "Icon"
+msgstr "الأيقونة"
+
+#. module: tailor_management
+#: model:ir.model.fields,help:tailor_management.field_tailor_order__activity_exception_icon
+msgid "Icon to indicate an exception activity."
+msgstr "أيقونة للإشارة إلى نشاط استثنائي."
+
+#. module: tailor_management
+#: model:ir.model.fields,help:tailor_management.field_tailor_order__message_needaction
+msgid "If checked, new messages require your attention."
+msgstr "إذا تم تحديده، هناك رسائل جديدة تتطلب انتباهك."
+
+#. module: tailor_management
+#: model:ir.model.fields,help:tailor_management.field_tailor_order__message_has_error
+#: model:ir.model.fields,help:tailor_management.field_tailor_order__message_has_sms_error
+msgid "If checked, some messages have a delivery error."
+msgstr "إذا تم تحديده، هناك بعض الرسائل بها خطأ في التسليم."
+
+#. module: tailor_management
+#: model_terms:ir.ui.view,arch_db:tailor_management.portal_my_tailor_orders
+msgid "In Progress"
+msgstr "جاري التنفيذ"
+
+#. module: tailor_management
+#: model:ir.model.fields,field_description:tailor_management.field_tailor_order__message_is_follower
+msgid "Is Follower"
+msgstr "هو متابع"
+
+#. module: tailor_management
+#: model:ir.model.fields,field_description:tailor_management.field_res_partner__is_customer
+#: model:ir.model.fields,field_description:tailor_management.field_res_users__is_customer
+msgid "Is a Customer"
+msgstr "هو عميل"
+
+#. module: tailor_management
+#: model:ir.model.fields.selection,name:tailor_management.selection__tailor_order__garment_type__kandura
+msgid "Kandura"
+msgstr "كندورة"
+
+#. module: tailor_management
+#: model:ir.model.fields,field_description:tailor_management.field_tailor_order__write_uid
+msgid "Last Updated by"
+msgstr "آخر تحديث بواسطة"
+
+#. module: tailor_management
+#: model:ir.model.fields,field_description:tailor_management.field_tailor_order__write_date
+msgid "Last Updated on"
+msgstr "آخر تحديث في"
+
+#. module: tailor_management
+#: model_terms:ir.ui.view,arch_db:tailor_management.view_tailor_order_form
+msgid "Mark Delivered"
+msgstr "تحديد كمُسلَّم"
+
+#. module: tailor_management
+#: model_terms:ir.ui.view,arch_db:tailor_management.view_tailor_order_form
+msgid "Mark Ready"
+msgstr "تحديد كجاهز"
+
+#. module: tailor_management
+#: model_terms:ir.ui.view,arch_db:tailor_management.view_tailor_order_form
+msgid "Mark Received"
+msgstr "تأكيد الاستلام"
+
+#. module: tailor_management
+#: model:ir.model.fields.selection,name:tailor_management.selection__tailor_order__status__measurement
+msgid "Measurement"
+msgstr "أخذ القياسات"
+
+#. module: tailor_management
+#: model:mail.template,subject:tailor_management.email_template_measurement
+msgid "Measurement Appointment: {{ object.name }}"
+msgstr "موعد القياس: {{ object.name }}"
+
+#. module: tailor_management
+#: model:mail.template,name:tailor_management.email_template_measurement
+msgid "Measurement Scheduled"
+msgstr "تم جدولة القياس"
+
+#. module: tailor_management
+#: model_terms:ir.ui.view,arch_db:tailor_management.portal_my_tailor_order_detail
+#: model_terms:ir.ui.view,arch_db:tailor_management.view_tailor_order_form
+msgid "Measurements"
+msgstr "القياسات"
+
+#. module: tailor_management
+#: model:ir.model.fields,field_description:tailor_management.field_tailor_order__message_has_error
+msgid "Message Delivery error"
+msgstr "خطأ في تسليم الرسائل"
+
+#. module: tailor_management
+#: model:ir.model.fields,field_description:tailor_management.field_tailor_order__message_ids
+msgid "Messages"
+msgstr "الرسائل"
+
+#. module: tailor_management
+#: model:ir.model.fields,field_description:tailor_management.field_tailor_order__my_activity_date_deadline
+msgid "My Activity Deadline"
+msgstr "موعد نشاطي النهائي"
+
+#. module: tailor_management
+#: model:ir.model.fields,field_description:tailor_management.field_tailor_order__activity_date_deadline
+msgid "Next Activity Deadline"
+msgstr "موعد النشاط التالي النهائي"
+
+#. module: tailor_management
+#: model:ir.model.fields,field_description:tailor_management.field_tailor_order__activity_summary
+msgid "Next Activity Summary"
+msgstr "ملخص النشاط التالي"
+
+#. module: tailor_management
+#: model:ir.model.fields,field_description:tailor_management.field_tailor_order__activity_type_id
+msgid "Next Activity Type"
+msgstr "نوع النشاط التالي"
+
+#. module: tailor_management
+#: model_terms:ir.ui.view,arch_db:tailor_management.view_tailor_order_form
+msgid "Notification Settings"
+msgstr "إعدادات الإشعارات"
+
+#. module: tailor_management
+#: model:ir.model.fields,field_description:tailor_management.field_tailor_order__message_needaction_counter
+msgid "Number of Actions"
+msgstr "عدد الإجراءات"
+
+#. module: tailor_management
+#: model:ir.model.fields,field_description:tailor_management.field_tailor_order__message_has_error_counter
+msgid "Number of errors"
+msgstr "عدد الأخطاء"
+
+#. module: tailor_management
+#: model:ir.model.fields,help:tailor_management.field_tailor_order__message_needaction_counter
+msgid "Number of messages requiring action"
+msgstr "عدد الرسائل التي تتطلب إجراء"
+
+#. module: tailor_management
+#: model:ir.model.fields,help:tailor_management.field_tailor_order__message_has_error_counter
+msgid "Number of messages with delivery error"
+msgstr "عدد الرسائل التي بها خطأ في التسليم"
+
+#. module: tailor_management
+#: model_terms:ir.ui.view,arch_db:tailor_management.portal_my_tailor_order_detail
+msgid "Order"
+msgstr "الطلب"
+
+#. module: tailor_management
+#: model:mail.template,name:tailor_management.email_template_cancelled
+msgid "Order Cancelled"
+msgstr "إلغاء الطلب"
+
+#. module: tailor_management
+#: model:mail.template,subject:tailor_management.email_template_order_received
+msgid "Order Confirmation: {{ object.name }}"
+msgstr "تأكيد الطلب: {{ object.name }}"
+
+#. module: tailor_management
+#: model:ir.model.fields,field_description:tailor_management.field_tailor_order__order_date
+msgid "Order Date"
+msgstr "تاريخ الطلب"
+
+#. module: tailor_management
+#: model:mail.template,name:tailor_management.email_template_delivered
+msgid "Order Delivered"
+msgstr "تم تسليم الطلب"
+
+#. module: tailor_management
+#: model:mail.template,name:tailor_management.email_template_ready
+msgid "Order Ready"
+msgstr "الطلب جاهز"
+
+#. module: tailor_management
+#: model:mail.template,name:tailor_management.email_template_order_received
+msgid "Order Received"
+msgstr "تم استلام الطلب"
+
+#. module: tailor_management
+#: model:ir.model.fields,field_description:tailor_management.field_tailor_order__name
+msgid "Order Reference"
+msgstr "رقم الطلب"
+
+#. module: tailor_management
+#: model:mail.template,name:tailor_management.email_template_production
+msgid "Order in Production"
+msgstr "الطلب قيد الإنتاج"
+
+#. module: tailor_management
+#: model:ir.ui.menu,name:tailor_management.menu_tailor_orders
+msgid "Orders"
+msgstr "الطلبات"
+
+#. module: tailor_management
+#: model:ir.model.fields.selection,name:tailor_management.selection__tailor_order__garment_type__other
+msgid "Other"
+msgstr "أخرى"
+
+#. module: tailor_management
+#: model:ir.model.fields.selection,name:tailor_management.selection__tailor_order__garment_type__pants
+msgid "Pants"
+msgstr "بنطال"
+
+#. module: tailor_management
+#: model:ir.model.fields,field_description:tailor_management.field_tailor_order__customer_phone
+msgid "Phone"
+msgstr "الهاتف"
+
+#. module: tailor_management
+#: model:ir.model.fields.selection,name:tailor_management.selection__tailor_order__status__quality_check
+#: model_terms:ir.ui.view,arch_db:tailor_management.view_tailor_order_form
+msgid "Quality Check"
+msgstr "فحص الجودة"
+
+#. module: tailor_management
+#: model_terms:ir.ui.view,arch_db:tailor_management.portal_my_tailor_orders
+#: model_terms:ir.ui.view,arch_db:tailor_management.view_tailor_order_search
+msgid "Ready"
+msgstr "جاهز"
+
+#. module: tailor_management
+#: model:ir.model.fields.selection,name:tailor_management.selection__tailor_order__status__ready
+msgid "Ready for Delivery"
+msgstr "جاهز للتسليم"
+
+#. module: tailor_management
+#: model:ir.model.fields.selection,name:tailor_management.selection__tailor_order__status__received
+msgid "Received"
+msgstr "تم الاستلام"
+
+#. module: tailor_management
+#: model_terms:ir.ui.view,arch_db:tailor_management.portal_my_tailor_orders
+msgid "Reference"
+msgstr "المرجع"
+
+#. module: tailor_management
+#: model:ir.model.fields,field_description:tailor_management.field_tailor_order__activity_user_id
+msgid "Responsible User"
+msgstr "المستخدم المسؤول"
+
+#. module: tailor_management
+#: model:ir.model.fields,field_description:tailor_management.field_tailor_order__message_has_sms_error
+msgid "SMS Delivery error"
+msgstr "خطأ في تسليم الرسائل القصيرة"
+
+#. module: tailor_management
+#: model:res.groups,name:tailor_management.group_tailor_sales
+msgid "Sales"
+msgstr "المبيعات"
+
+#. module: tailor_management
+#: model:ir.model.fields,field_description:tailor_management.field_tailor_order__salesperson_id
+msgid "Salesperson"
+msgstr "موظف المبيعات"
+
+#. module: tailor_management
+#: model:ir.model.fields,field_description:tailor_management.field_tailor_order__send_email_notifications
+msgid "Send Email Notifications"
+msgstr "إرسال إشعارات البريد الإلكتروني"
+
+#. module: tailor_management
+#: model:ir.model.fields,field_description:tailor_management.field_tailor_order__send_sms_notifications
+msgid "Send Sms Notifications"
+msgstr "إرسال إشعارات الرسائل القصيرة"
+
+#. module: tailor_management
+#: model:ir.model.fields.selection,name:tailor_management.selection__tailor_order__status__sewing
+msgid "Sewing"
+msgstr "خياطة"
+
+#. module: tailor_management
+#: model:ir.model.fields.selection,name:tailor_management.selection__tailor_order__garment_type__shirt
+msgid "Shirt"
+msgstr "قميص"
+
+#. module: tailor_management
+#: model:ir.model.fields,field_description:tailor_management.field_tailor_order__shoulder_width
+msgid "Shoulder Width"
+msgstr "عرض الكتفين"
+
+#. module: tailor_management
+#: model:ir.model.fields,field_description:tailor_management.field_tailor_order__sleeve_length
+msgid "Sleeve Length"
+msgstr "طول الكم"
+
+#. module: tailor_management
+#: model:ir.model.fields,field_description:tailor_management.field_tailor_order__special_instructions
+#: model_terms:ir.ui.view,arch_db:tailor_management.view_tailor_order_form
+msgid "Special Instructions"
+msgstr "تعليمات خاصة"
+
+#. module: tailor_management
+#: model_terms:ir.ui.view,arch_db:tailor_management.view_tailor_order_form
+msgid "Start Cutting"
+msgstr "بدء القص"
+
+#. module: tailor_management
+#: model_terms:ir.ui.view,arch_db:tailor_management.view_tailor_order_form
+msgid "Start Finishing"
+msgstr "بدء التشطيب"
+
+#. module: tailor_management
+#: model_terms:ir.ui.view,arch_db:tailor_management.view_tailor_order_form
+msgid "Start Measurement"
+msgstr "بدء أخذ القياسات"
+
+#. module: tailor_management
+#: model_terms:ir.ui.view,arch_db:tailor_management.view_tailor_order_form
+msgid "Start Sewing"
+msgstr "بدء الخياطة"
+
+#. module: tailor_management
+#: model:ir.model.fields,field_description:tailor_management.field_tailor_order__status
+#: model_terms:ir.ui.view,arch_db:tailor_management.portal_my_tailor_orders
+msgid "Status"
+msgstr "الحالة"
+
+#. module: tailor_management
+#: model:mail.template,subject:tailor_management.email_template_production
+msgid "Status Update: {{ object.name }}"
+msgstr "تحديث الحالة: {{ object.name }}"
+
+#. module: tailor_management
+#: model:ir.model.fields,help:tailor_management.field_tailor_order__activity_state
+msgid ""
+"Status based on activities\n"
+"Overdue: Due date is already passed\n"
+"Today: Activity date is today\n"
+"Planned: Future activities."
+msgstr ""
+"الحالة بناءً على الأنشطة\n"
+"متأخر: تجاوز تاريخ الاستحقاق\n"
+"اليوم: تاريخ النشاط هو اليوم\n"
+"مخطط: أنشطة مستقبلية."
+
+#. module: tailor_management
+#. odoo-python
+#: code:addons/tailor_management/models/tailor_order.py:0
+msgid "Status changed from %s to %s"
+msgstr "تغيرت الحالة من %s إلى %s"
+
+#. module: tailor_management
+#: model:ir.model.fields.selection,name:tailor_management.selection__tailor_order__garment_type__suit
+msgid "Suit"
+msgstr "بدلة"
+
+#. module: tailor_management
+#: model:ir.model.fields,field_description:tailor_management.field_tailor_order__tailor_id
+#: model:res.groups,name:tailor_management.group_tailor_worker
+msgid "Tailor"
+msgstr "الخياط"
+
+#. module: tailor_management
+#: model_terms:ir.ui.view,arch_db:tailor_management.view_partner_form_inherit_tailor
+msgid "Tailor Customer"
+msgstr "عميل خياطة"
+
+#. module: tailor_management
+#: model_terms:ir.ui.view,arch_db:tailor_management.view_res_partner_filter_inherit_tailor
+msgid "Tailor Customers"
+msgstr "عملاء الخياطة"
+
+#. module: tailor_management
+#: model:ir.module.category,name:tailor_management.module_category_tailor_management
+#: model:ir.ui.menu,name:tailor_management.menu_tailor_root
+msgid "Tailor Management"
+msgstr "إدارة الخياطة"
+
+#. module: tailor_management
+#: model:ir.module.category,description:tailor_management.module_category_tailor_management
+msgid "Tailor Management System"
+msgstr "نظام إدارة الخياطة"
+
+#. module: tailor_management
+#: model:ir.model,name:tailor_management.model_tailor_order
+#: model_terms:ir.ui.view,arch_db:tailor_management.view_tailor_order_form
+msgid "Tailor Order"
+msgstr "طلب خياطة"
+
+#. module: tailor_management
+#: model:ir.actions.act_window,name:tailor_management.action_tailor_orders
+#: model_terms:ir.ui.view,arch_db:tailor_management.portal_my_home_menu_tailor
+#: model_terms:ir.ui.view,arch_db:tailor_management.portal_my_home_tailor
+#: model_terms:ir.ui.view,arch_db:tailor_management.portal_my_tailor_orders
+#: model_terms:ir.ui.view,arch_db:tailor_management.view_tailor_order_list
+#: model_terms:ir.ui.view,arch_db:tailor_management.view_tailor_order_search
+msgid "Tailor Orders"
+msgstr "طلبات الخياطة"
+
+#. module: tailor_management
+#: model:mail.template,subject:tailor_management.email_template_delivered
+msgid "Thank you for your order: {{ object.name }}"
+msgstr "شكراً لطلبك: {{ object.name }}"
+
+#. module: tailor_management
+#: model_terms:ir.ui.view,arch_db:tailor_management.portal_my_tailor_orders
+msgid "There are currently no orders for your account."
+msgstr "لا توجد طلبات حالياً في حسابك."
+
+#. module: tailor_management
+#: model:ir.model.fields.selection,name:tailor_management.selection__tailor_order__garment_type__thobe
+msgid "Thobe"
+msgstr "ثوب"
+
+#. module: tailor_management
+#: model:ir.model.fields,field_description:tailor_management.field_tailor_order__total_amount
+msgid "Total Amount"
+msgstr "المبلغ الإجمالي"
+
+#. module: tailor_management
+#: model:ir.model.fields,help:tailor_management.field_tailor_order__activity_exception_decoration
+msgid "Type of the exception activity on record."
+msgstr "نوع النشاط الاستثنائي في السجل."
+
+#. module: tailor_management
+#: model:ir.model.fields,field_description:tailor_management.field_tailor_order__waist_measurement
+msgid "Waist Measurement"
+msgstr "قياس الخصر"
+
+#. module: tailor_management
+#: model:ir.model.fields,field_description:tailor_management.field_tailor_order__website_message_ids
+msgid "Website Messages"
+msgstr "رسائل الموقع"
+
+#. module: tailor_management
+#: model:ir.model.fields,help:tailor_management.field_tailor_order__website_message_ids
+msgid "Website communication history"
+msgstr "سجل تواصل الموقع"
+
+#. module: tailor_management
+#: model:mail.template,subject:tailor_management.email_template_ready
+msgid "Your order {{ object.name }} is ready for pickup!"
+msgstr "طلبك {{ object.name }} جاهز للاستلام!"

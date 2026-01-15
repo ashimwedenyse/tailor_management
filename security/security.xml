@@ -1,94 +1,56 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-    <data noupdate="1">
+    <data noupdate="0">
 
-        <!-- =========================================== -->
-        <!-- MODULE CATEGORY -->
-        <!-- =========================================== -->
         <record id="module_category_tailor_management" model="ir.module.category">
             <field name="name">Tailor Management</field>
-            <field name="description">Tailor Management System</field>
-            <field name="sequence">100</field>
+            <field name="description">Access levels for Tailor System</field>
+            <field name="sequence">10</field>
         </record>
 
-        <!-- =========================================== -->
-        <!-- SECURITY GROUPS -->
-        <!-- =========================================== -->
-        
-        <!-- Tailor Admin: Full access to all orders and settings -->
-        <record id="group_tailor_admin" model="res.groups">
-            <field name="name">Admin</field>
-            <field name="category_id" ref="module_category_tailor_management"/>
-            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
-            <field name="comment">Full access to all tailor management features</field>
-        </record>
-
-        <!-- Tailor Sales: Can create and manage orders -->
-        <record id="group_tailor_sales" model="res.groups">
-            <field name="name">Sales</field>
-            <field name="category_id" ref="module_category_tailor_management"/>
-            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
-            <field name="comment">Can create and edit orders, but not delete</field>
-        </record>
-
-        <!-- Tailor Worker: Can view and update assigned orders -->
         <record id="group_tailor_worker" model="res.groups">
-            <field name="name">Tailor</field>
-            <field name="category_id" ref="module_category_tailor_management"/>
-            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
-            <field name="comment">Can view and update orders assigned to them</field>
+            <field name="name">Tailor (Worker)</field>
+            <field name="category_id" ref="module_category_tailor_management"/> <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+            <field name="comment">Can view and update orders assigned to them.</field>
         </record>
 
-        <!-- =========================================== -->
-        <!-- RECORD RULES -->
-        <!-- =========================================== -->
-        
-        <!-- Admin: See all orders -->
-        <record id="tailor_order_admin_rule" model="ir.rule">
-            <field name="name">Tailor Order: Admin sees all</field>
-            <field name="model_id" ref="model_tailor_order"/>
-            <field name="domain_force">[(1, '=', 1)]</field>
-            <field name="groups" eval="[(4, ref('group_tailor_admin'))]"/>
-            <field name="perm_read" eval="True"/>
-            <field name="perm_write" eval="True"/>
-            <field name="perm_create" eval="True"/>
-            <field name="perm_unlink" eval="True"/>
+        <record id="group_tailor_sales" model="res.groups">
+            <field name="name">Sales Person</field>
+            <field name="category_id" ref="module_category_tailor_management"/> <field name="implied_ids" eval="[(4, ref('group_tailor_worker'))]"/> <field name="comment">Can create and edit orders, view Showroom Dashboard.</field>
         </record>
 
-        <!-- Sales: See all orders -->
-        <record id="tailor_order_sales_rule" model="ir.rule">
-            <field name="name">Tailor Order: Sales sees all</field>
-            <field name="model_id" ref="model_tailor_order"/>
-            <field name="domain_force">[(1, '=', 1)]</field>
-            <field name="groups" eval="[(4, ref('group_tailor_sales'))]"/>
-            <field name="perm_read" eval="True"/>
-            <field name="perm_write" eval="True"/>
-            <field name="perm_create" eval="True"/>
-            <field name="perm_unlink" eval="False"/>
+        <record id="group_tailor_admin" model="res.groups">
+            <field name="name">Administrator</field>
+            <field name="category_id" ref="module_category_tailor_management"/> <field name="implied_ids" eval="[(4, ref('group_tailor_sales'))]"/> <field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+            <field name="comment">Full access to Financials, Profits, and Deletion.</field>
         </record>
 
-        <!-- Tailor: See only assigned orders or orders without assigned tailor -->
         <record id="tailor_order_worker_rule" model="ir.rule">
             <field name="name">Tailor Order: Workers see assigned orders</field>
             <field name="model_id" ref="model_tailor_order"/>
             <field name="domain_force">['|', ('tailor_id', '=', user.id), ('tailor_id', '=', False)]</field>
             <field name="groups" eval="[(4, ref('group_tailor_worker'))]"/>
-            <field name="perm_read" eval="True"/>
-            <field name="perm_write" eval="True"/>
-            <field name="perm_create" eval="False"/>
-            <field name="perm_unlink" eval="False"/>
         </record>
 
-        <!-- Portal: See only own orders -->
+        <record id="tailor_order_sales_rule" model="ir.rule">
+            <field name="name">Tailor Order: Sales sees all</field>
+            <field name="model_id" ref="model_tailor_order"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_tailor_sales'))]"/>
+        </record>
+
+        <record id="tailor_order_admin_rule" model="ir.rule">
+            <field name="name">Tailor Order: Admin sees all</field>
+            <field name="model_id" ref="model_tailor_order"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_tailor_admin'))]"/>
+        </record>
+
         <record id="tailor_order_portal_rule" model="ir.rule">
             <field name="name">Tailor Order: Portal users see own orders</field>
             <field name="model_id" ref="model_tailor_order"/>
             <field name="domain_force">[('customer_id', '=', user.partner_id.id)]</field>
             <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
-            <field name="perm_read" eval="True"/>
-            <field name="perm_write" eval="False"/>
-            <field name="perm_create" eval="False"/>
-            <field name="perm_unlink" eval="False"/>
         </record>
 
     </data>

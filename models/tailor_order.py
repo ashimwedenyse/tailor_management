@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 from odoo import models, fields, api, _
-from odoo.exceptions import UserError, ValidationError
+from odoo.exceptions import ValidationError
+from twilio.rest import Client
 import logging
 
 _logger = logging.getLogger(__name__)
+
 
 class TailorOrder(models.Model):
     _name = 'tailor.order'
@@ -18,7 +20,8 @@ class TailorOrder(models.Model):
         string="Order Reference",
         required=True,
         readonly=True,
-        default=lambda self: _('New'),
+        default='New',
+        copy=False,
         tracking=True
     )
 
@@ -27,7 +30,7 @@ class TailorOrder(models.Model):
         string="Customer",
         required=True,
         tracking=True,
-        domain=[('customer_rank', '>', 0)]
+        domain=[]
     )
 
     status = fields.Selection([
@@ -41,22 +44,29 @@ class TailorOrder(models.Model):
         ('ready', "Ready for Delivery"),
         ('delivered', "Delivered"),
         ('cancelled', "Cancelled")
-    ], string="Status", default='draft', tracking=True)
+    ], default='draft', tracking=True)
 
-    order_date = fields.Datetime(string="Order Date", default=fields.Datetime.now, required=True)
-    delivery_date = fields.Datetime(string="Expected Delivery Date", tracking=True)
+    order_date = fields.Datetime(default=fields.Datetime.now, required=True)
+    delivery_date = fields.Datetime(tracking=True)
+
+    # --- Document Management ---
+    design_image = fields.Binary(string="Design Sketch", attachment=True)
+    fabric_image = fields.Binary(string="Fabric Photo", attachment=True)
+
+    # Counts attached files for the Smart Button
+    document_count = fields.Integer(compute='_compute_document_count', string="Document Count")
 
     # Measurements
-    chest_measurement = fields.Float(string="Chest (cm)", tracking=True)
-    waist_measurement = fields.Float(string="Waist (cm)", tracking=True)
-    hip_measurement = fields.Float(string="Hip (cm)", tracking=True)
-    shoulder_width = fields.Float(string="Shoulder Width (cm)", tracking=True)
-    sleeve_length = fields.Float(string="Sleeve Length (cm)", tracking=True)
-    armhole = fields.Float(string="Armhole (cm)", tracking=True)
-    back_length = fields.Float(string="Back Length (cm)", tracking=True)
-    front_length = fields.Float(string="Front Length (cm)", tracking=True)
+    chest_measurement = fields.Float(tracking=True)
+    waist_measurement = fields.Float(tracking=True)
+    hip_measurement = fields.Float(tracking=True)
+    shoulder_width = fields.Float(tracking=True)
+    sleeve_length = fields.Float(tracking=True)
+    armhole = fields.Float(tracking=True)
+    back_length = fields.Float(tracking=True)
+    front_length = fields.Float(tracking=True)
 
-    # Garment details
+    # Garment
     garment_type = fields.Selection([
         ('kandura', "Kandura"),
         ('thobe', "Thobe"),
@@ -64,301 +74,289 @@ class TailorOrder(models.Model):
         ('pants', "Pants"),
         ('suit', "Suit"),
         ('other', "Other")
-    ], string="Garment Type", default='kandura', tracking=True)
-    fabric_type = fields.Char(string="Fabric Type", tracking=True)
-    color = fields.Char(string="Color", tracking=True)
-    special_instructions = fields.Text(string="Special Instructions")
+    ], default='kandura', tracking=True)
 
-    # Financial
+    fabric_type = fields.Char(tracking=True)
+    color = fields.Char(tracking=True)
+    special_instructions = fields.Text()
+
+    # --- Financial & KPIs (UPDATED) ---
     currency_id = fields.Many2one(
         'res.currency',
-        string="Currency",
         default=lambda self: self.env.company.currency_id,
         required=True
     )
-    total_amount = fields.Monetary(string="Total Amount", currency_field='currency_id', tracking=True)
-    advance_paid = fields.Monetary(string="Advance Paid", currency_field='currency_id', tracking=True)
-    balance_due = fields.Monetary(string="Balance Due", currency_field='currency_id', compute='_compute_balance', store=True)
+
+    total_amount = fields.Monetary(string="Total Revenue", tracking=True)
+    advance_paid = fields.Monetary(tracking=True)
+    balance_due = fields.Monetary(compute='_compute_balance', store=True)
+
+    # NEW: Costs & Profit for Dashboard
+    production_cost = fields.Monetary(string="Production Cost", default=0.0, tracking=True)
+    net_profit = fields.Monetary(string="Net Profit", compute="_compute_profit", store=True, tracking=True)
 
     # Notifications
-    send_email_notifications = fields.Boolean(string="Email Notifications", default=True, tracking=True)
-    send_sms_notifications = fields.Boolean(string="SMS/WhatsApp Notifications", default=False, tracking=True)
+    send_email_notifications = fields.Boolean(default=True, tracking=True)
+    send_sms_notifications = fields.Boolean(default=True, tracking=True)
 
-    # Related fields
-    attachment_ids = fields.Many2many('ir.attachment', string="Attachments")
+    # Relations
+    attachment_ids = fields.Many2many('ir.attachment')
+    salesperson_id = fields.Many2one('res.users', default=lambda self: self.env.user, tracking=True)
+    tailor_id = fields.Many2one('res.users', tracking=True)
 
-    # Assigned staff
-    salesperson_id = fields.Many2one('res.users', string="Salesperson", default=lambda self: self.env.user, tracking=True)
-    tailor_id = fields.Many2one('res.users', string="Assigned Tailor", tracking=True)
-
-    # Computed/related fields
-    customer_phone = fields.Char(string="Customer Phone", related='customer_id.phone', readonly=True)
-    customer_email = fields.Char(string="Customer Email", related='customer_id.email', readonly=True)
+    customer_phone = fields.Char(related='customer_id.phone', readonly=True)
+    customer_email = fields.Char(related='customer_id.email', readonly=True)
 
     # =========================
-    # Constraints & computations
+    # Computed Methods
     # =========================
     @api.depends('total_amount', 'advance_paid')
     def _compute_balance(self):
         for order in self:
             order.balance_due = order.total_amount - order.advance_paid
 
+    @api.depends('total_amount', 'production_cost')
+    def _compute_profit(self):
+        for order in self:
+            order.net_profit = order.total_amount - order.production_cost
+
+    def _compute_document_count(self):
+        for order in self:
+            order.document_count = self.env['ir.attachment'].search_count([
+                ('res_model', '=', 'tailor.order'),
+                ('res_id', '=', order.id)
+            ])
+
+    # =========================
+    # Actions (Buttons)
+    # =========================
+    def action_view_documents(self):
+        """ Opens the standard Odoo document view for this record """
+        self.ensure_one()
+        return {
+            'name': _('Documents'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'ir.attachment',
+            'view_mode': 'kanban,tree,form',
+            'domain': [('res_model', '=', 'tailor.order'), ('res_id', '=', self.id)],
+            'context': {'default_res_model': 'tailor.order', 'default_res_id': self.id},
+        }
+
+    # =========================
+    # Constraints
+    # =========================
     @api.constrains('advance_paid', 'total_amount')
-    def _check_advance_amount(self):
+    def _check_advance(self):
         for order in self:
             if order.advance_paid < 0:
-                raise ValidationError(_("Advance paid cannot be negative."))
+                raise ValidationError(_("Advance cannot be negative"))
             if order.advance_paid > order.total_amount:
-                raise ValidationError(_("Advance paid cannot exceed total amount."))
-
-    @api.constrains('chest_measurement', 'waist_measurement', 'hip_measurement')
-    def _check_measurements(self):
-        for order in self:
-            if order.chest_measurement < 0 or order.waist_measurement < 0 or order.hip_measurement < 0:
-                raise ValidationError(_("Measurements cannot be negative."))
-
-    @api.model
-    def create(self, vals):
-        if vals.get('name', _('New')) == _('New'):
-            vals['name'] = self.env['ir.sequence'].next_by_code('tailor.order') or _('New')
-        return super(TailorOrder, self).create(vals)
+                raise ValidationError(_("Advance cannot exceed total"))
 
     # =========================
-    # Status update methods
+    # Create override
+    # =========================
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if vals.get('name', 'New') == 'New':
+                vals['name'] = self.env['ir.sequence'].next_by_code('tailor.order') or 'New'
+        return super(TailorOrder, self).create(vals_list)
+
+    # =========================
+    # Status update actions
     # =========================
     def _update_status(self, new_status):
-        """Update status and trigger notifications"""
-        old_status = self.status
-        self.write({'status': new_status})
-        
-        # Send notifications for specific status changes
-        self._send_status_notifications(old_status, new_status)
+        for order in self:
+            old_status = order.status
+            order.status = new_status
+            order._send_status_notifications(old_status, new_status)
 
-    def action_confirm_received(self): 
+    def action_confirm_received(self):
         self._update_status('received')
 
-    def action_start_measurement(self): 
+    def action_start_measurement(self):
         self._update_status('measurement')
 
-    def action_start_cutting(self): 
+    def action_start_cutting(self):
         self._update_status('cutting')
 
-    def action_start_sewing(self): 
+    def action_start_sewing(self):
         self._update_status('sewing')
 
-    def action_start_finishing(self): 
+    def action_start_finishing(self):
         self._update_status('finishing')
 
-    def action_quality_check(self): 
+    def action_quality_check(self):
         self._update_status('quality_check')
 
-    def action_mark_ready(self): 
+    def action_mark_ready(self):
         self._update_status('ready')
 
-    def action_mark_delivered(self): 
+    def action_mark_delivered(self):
         self._update_status('delivered')
 
-    def action_cancel(self): 
+    def action_cancel(self):
         self._update_status('cancelled')
 
     # =========================
-    # Portal & communication buttons
+    # Notifications (CLEAN PRODUCTION VERSION)
     # =========================
-    def call_customer(self):
-        self.ensure_one()
-        if not self.customer_phone:
-            raise UserError(_("No phone number available for customer."))
-        return {'type': 'ir.actions.act_url', 'url': f'tel:{self.customer_phone}', 'target': 'self'}
+    def _send_status_notifications(self, old, new):
+        for order in self:
+            # 1. Log the status change
+            order.message_post(
+                body=_("Status changed from %s to %s") % (old.capitalize(), new.capitalize()),
+                subtype_xmlid='mail.mt_note'
+            )
 
-    def email_customer(self):
-        self.ensure_one()
-        if not self.customer_email:
-            raise UserError(_("No email available for customer."))
-        return {
-            'type': 'ir.actions.act_window',
-            'name': _('Compose Email'),
-            'res_model': 'mail.compose.message',
-            'view_mode': 'form',
-            'target': 'new',
-            'context': {
-                'default_composition_mode': 'comment',
-                'default_model': 'tailor.order',
-                'default_res_id': self.id,
-                'default_partner_ids': [(6, 0, [self.customer_id.id])],
-                'default_subject': _('Regarding your order %s') % self.name,
-            },
-        }
+            # 2. Handle Email
+            if order.send_email_notifications:
+                order._send_email_notification(new)
 
-    def _get_portal_url(self):
-        """Generate portal URL for this order"""
-        self.ensure_one()
-        base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
-        return f"{base_url}/my/tailor/orders/{self.id}"
-
-    def get_portal_url(self):
-        """Action to open portal URL"""
-        self.ensure_one()
-        return {
-            'type': 'ir.actions.act_url', 
-            'url': self._get_portal_url(), 
-            'target': 'new'
-        }
-
-    def action_send_test_email(self):
-        """Test email button"""
-        self.ensure_one()
-        self._send_email_notification(self.status)
-        return {
-            'type': 'ir.actions.client',
-            'tag': 'display_notification',
-            'params': {
-                'title': _('Test Email Sent'),
-                'message': _('A test email has been sent to %s') % self.customer_email,
-                'type': 'success',
-                'sticky': False,
-            }
-        }
-
-    def action_send_test_sms(self):
-        """Test SMS button"""
-        self.ensure_one()
-        self._send_sms_notification(self.status)
-        return {
-            'type': 'ir.actions.client',
-            'tag': 'display_notification',
-            'params': {
-                'title': _('Test SMS Sent'),
-                'message': _('A test SMS would be sent to %s') % self.customer_phone,
-                'type': 'info',
-                'sticky': False,
-            }
-        }
-
-    # =========================
-    # Notification system
-    # =========================
-    def _send_status_notifications(self, old_status, new_status):
-        """Send notifications when status changes"""
-        self.ensure_one()
-        
-        # Log in chatter
-        status_display = dict(self._fields['status'].selection).get(new_status)
-        self.message_post(
-            body=_("Status updated from %s to: %s") % (
-                dict(self._fields['status'].selection).get(old_status, old_status),
-                status_display
-            ),
-            subtype_xmlid='mail.mt_note'
-        )
-        
-        # Send email notification
-        if self.send_email_notifications and self.customer_email:
-            self._send_email_notification(new_status)
-        
-        # Send SMS/WhatsApp notification
-        if self.send_sms_notifications and self.customer_phone:
-            self._send_sms_notification(new_status)
+            # 3. Handle SMS
+            mobile = getattr(order.customer_id, 'mobile', False)
+            target_phone = order.customer_phone or mobile
+            if order.send_sms_notifications and target_phone:
+                order._send_sms_notification(new, target_phone)
 
     def _send_email_notification(self, status):
-        """Send email notification based on status"""
+        """Send email notification based on order status using Tailor Gmail server"""
         self.ensure_one()
-        
-        # Map status to email template
-        template_mapping = {
+        mapping = {
             'received': 'tailor_management.email_template_order_received',
             'measurement': 'tailor_management.email_template_measurement',
             'cutting': 'tailor_management.email_template_production',
             'sewing': 'tailor_management.email_template_production',
             'finishing': 'tailor_management.email_template_production',
-            'quality_check': 'tailor_management.email_template_quality_check',
+            'quality_check': None,
             'ready': 'tailor_management.email_template_ready',
             'delivered': 'tailor_management.email_template_delivered',
             'cancelled': 'tailor_management.email_template_cancelled',
         }
-        
-        template_xmlid = template_mapping.get(status)
-        if not template_xmlid:
-            _logger.info(f"No email template for status: {status}")
-            return
-        
-        try:
-            template = self.env.ref(template_xmlid)
-            if template:
-                template.send_mail(self.id, force_send=True, raise_exception=False)
-                _logger.info(f"Email sent for order {self.name} - status: {status}")
-            else:
-                _logger.warning(f"Email template not found: {template_xmlid}")
-        except Exception as e:
-            _logger.error(f"Failed to send email for order {self.name}: {str(e)}")
 
-    def _send_sms_notification(self, status):
-        """Send SMS/WhatsApp notification based on status"""
-        self.ensure_one()
-        
-        # SMS message templates
-        sms_messages = {
-            'received': _("Hello %s! Your order %s has been received. We'll contact you soon for measurements."),
-            'measurement': _("Hi %s! Time to schedule measurements for order %s. Please call us."),
-            'cutting': _("Hi %s! Your order %s is now in production (Cutting stage)."),
-            'sewing': _("Hi %s! Your order %s is being sewn. We're making progress!"),
-            'finishing': _("Hi %s! Your order %s is in finishing stage. Almost ready!"),
-            'quality_check': _("Hi %s! Your order %s is undergoing quality check."),
-            'ready': _("Great news %s! Your order %s is ready for pickup! Balance due: %.2f %s"),
-            'delivered': _("Thank you %s! Order %s has been delivered. We hope you're satisfied!"),
-            'cancelled': _("Hi %s, your order %s has been cancelled. Please contact us for details."),
+        xmlid = mapping.get(status)
+        if not xmlid:
+            return
+
+        template = self.env.ref(xmlid, raise_if_not_found=False)
+        if not template:
+            _logger.warning("Email template not found: %s", xmlid)
+            return
+
+        if not self.customer_email:
+            _logger.warning("Customer email missing for order %s", self.name)
+            return
+
+        # Force Gmail Server
+        mail_server = self.env['ir.mail_server'].search([('name', '=', 'Tailor Gmail')], limit=1)
+
+        email_values = {
+            'email_to': self.customer_email,
+            'email_from': mail_server.smtp_user if mail_server else (self.env.user.email or self.env.company.email),
+            'reply_to': self.env.company.email or '',
         }
-        
-        message_template = sms_messages.get(status)
-        if not message_template:
-            _logger.info(f"No SMS template for status: {status}")
-            return
-        
+
+        if mail_server:
+            email_values['mail_server_id'] = mail_server.id
+
         try:
-            # Format message
-            if status == 'ready':
-                message = message_template % (
-                    self.customer_id.name,
-                    self.name,
-                    self.balance_due,
-                    self.currency_id.symbol
-                )
-            else:
-                message = message_template % (self.customer_id.name, self.name)
-            
-            # Send SMS (this requires SMS module or WhatsApp integration)
-            # For now, we'll just log it
-            _logger.info(f"SMS would be sent to {self.customer_phone}: {message}")
-            
-            # If you have SMS module installed, uncomment:
-            # self.env['sms.sms'].create({
-            #     'number': self.customer_phone,
-            #     'body': message,
-            # })._send()
-            
+            template.sudo().send_mail(
+                self.id,
+                force_send=True,
+                email_values=email_values
+            )
+            _logger.info("Email sent for order %s (status: %s)", self.name, status)
         except Exception as e:
-            _logger.error(f"Failed to send SMS for order {self.name}: {str(e)}")
+            _logger.error("Failed to send email for order %s: %s", self.name, str(e))
 
     # =========================
-    # Scheduled Actions
+    # Twilio helpers
     # =========================
-    @api.model
-    def _cron_send_delivery_reminders(self):
-        """Cron job to send reminders for orders due today"""
-        today = fields.Date.today()
-        orders = self.search([
-            ('delivery_date', '=', today),
-            ('status', 'in', ['cutting', 'sewing', 'finishing', 'quality_check'])
-        ])
-        
-        for order in orders:
-            try:
-                if order.send_email_notifications and order.customer_email:
-                    template = self.env.ref('tailor_management.email_template_delivery_reminder')
-                    template.send_mail(order.id, force_send=True, raise_exception=False)
-                
-                if order.send_sms_notifications and order.customer_phone:
-                    message = _("Reminder: Order %s is scheduled for delivery today. We're working to complete it!") % order.name
-                    _logger.info(f"Reminder SMS for {order.name}: {message}")
-                    
-            except Exception as e:
-                _logger.error(f"Failed to send reminder for order {order.name}: {str(e)}")
+    def _get_twilio_config(self):
+        params = self.env['ir.config_parameter'].sudo()
+        return {
+            'sid': params.get_param('tailor_management.twilio_account_sid'),
+            'token': params.get_param('tailor_management.twilio_auth_token'),
+            'from': params.get_param('tailor_management.twilio_from_number'),
+        }
+
+    def _send_sms_notification(self, status, target_phone=None):
+        self.ensure_one()
+
+        # 1. DEFINE MESSAGES
+        messages = {
+            'received': _("Hello %s! Your order %s has been received."),
+            'measurement': _("Hi %s! Measurement scheduled for order %s."),
+            'cutting': _("Hello %s, your order %s is now in cutting."),
+            'sewing': _("Hello %s, your order %s is being sewn."),
+            'finishing': _("Hello %s, your order %s is in finishing."),
+            'quality_check': _("Hello %s, order %s is under quality check."),
+            'ready': _("Hello %s, Order %s ready! Balance: %.2f %s"),
+            'delivered': _("Hello %s, Order %s delivered. Thank you!"),
+            'cancelled': _("Hello %s, Order %s has been cancelled."),
+        }
+
+        template_text = messages.get(status)
+        if not template_text:
+            return
+
+        # 2. FORMAT BODY TEXT
+        if status == 'ready':
+            body = template_text % (
+                self.customer_id.name or "Customer",
+                self.name,
+                self.balance_due,
+                self.currency_id.symbol
+            )
+        else:
+            body = template_text % (
+                self.customer_id.name or "Customer",
+                self.name
+            )
+
+        # 3. GET CONFIG & SEND
+        try:
+            cfg = self._get_twilio_config()
+
+            if not all(cfg.values()):
+                # Log to server logs only, keep chatter clean
+                _logger.warning("Twilio config missing. SMS skipped for %s", self.name)
+                return
+
+            # Formatting
+            from_number = cfg['from']
+            if not from_number.startswith('whatsapp:'):
+                from_number = f"whatsapp:{from_number}"
+
+            if not target_phone:
+                mobile = getattr(self.customer_id, 'mobile', False)
+                target_phone = self.customer_phone or mobile
+
+            if not target_phone:
+                return  # Skip silently if no phone found
+
+            # Clean Number
+            to_number = target_phone.replace(' ', '')
+            if to_number.startswith('0'):
+                to_number = '+250' + to_number[1:]
+
+            if not to_number.startswith('+'):
+                # Log error to chatter only if phone number format is invalid
+                self.message_post(body=f"⚠️ WhatsApp Failed: Number {to_number} invalid format.")
+                return
+
+            if not to_number.startswith('whatsapp:'):
+                to_number = f"whatsapp:{to_number}"
+
+            # SEND MESSAGE
+            client = Client(cfg['sid'], cfg['token'])
+            client.messages.create(body=body, from_=from_number, to=to_number)
+
+            # Log Success in Chatter (Professional Note)
+            self.message_post(body=f"WhatsApp notification sent to {target_phone}")
+
+        except Exception as e:
+            _logger.error("WhatsApp failed: %s", str(e))
+            # Only show critical errors in chatter
+            self.message_post(body=f"⚠️ WhatsApp Failed: {str(e)}")

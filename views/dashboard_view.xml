@@ -1,0 +1,56 @@
+<odoo>
+    <record id="view_tailor_order_graph" model="ir.ui.view">
+        <field name="name">tailor.order.graph</field>
+        <field name="model">tailor.order</field>
+        <field name="arch" type="xml">
+            <graph string="Executive Dashboard" type="bar" sample="1">
+                <field name="create_date" interval="month"/>
+                <field name="total_amount" type="measure"/>
+                <field name="net_profit" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_tailor_order_pivot" model="ir.ui.view">
+        <field name="name">tailor.order.pivot</field>
+        <field name="model">tailor.order</field>
+        <field name="arch" type="xml">
+            <pivot string="Performance Analysis" sample="1">
+                <field name="create_date" interval="month" type="row"/>
+                <field name="customer_id" type="row"/>
+                <field name="total_amount" type="measure" string="Total Revenue"/>
+                <field name="net_profit" type="measure" string="Total Profit"/>
+                <field name="production_cost" type="measure" string="Total Cost"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_tailor_order_search_dashboard" model="ir.ui.view">
+        <field name="name">tailor.order.search.dashboard</field>
+        <field name="model">tailor.order</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" string="Order Number"/>
+                <field name="customer_id"/>
+
+                <filter string="Active Orders" name="active_orders"
+                        domain="[('status', 'not in', ['draft', 'delivered', 'cancelled'])]"/>
+                <filter string="High Value (>1000)" name="high_value" domain="[('total_amount', '>', 1000)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_tailor_dashboard" model="ir.actions.act_window">
+        <field name="name">Executive Dashboard</field>
+        <field name="res_model">tailor.order</field>
+        <field name="view_mode">graph,pivot</field>
+        <field name="view_id" ref="view_tailor_order_graph"/>
+        <field name="context">{'search_default_active_orders': 1}</field>
+    </record>
+
+    <menuitem id="menu_tailor_dashboard"
+              name="Dashboard"
+              parent="menu_tailor_root"
+              action="action_tailor_dashboard"
+              sequence="1"/>
+</odoo>

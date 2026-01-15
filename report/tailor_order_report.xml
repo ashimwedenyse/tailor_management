@@ -1,0 +1,174 @@
+<odoo>
+    <record id="action_report_job_card" model="ir.actions.report">
+        <field name="name">Production Job Card</field>
+        <field name="model">tailor.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">tailor_management.report_job_card_template</field>
+        <field name="report_file">tailor_management.report_job_card_template</field>
+        <field name="print_report_name">'Job_Card_%s' % object.name</field>
+        <field name="binding_model_id" ref="model_tailor_order"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <record id="action_report_customer_receipt" model="ir.actions.report">
+        <field name="name">Customer Receipt</field>
+        <field name="model">tailor.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">tailor_management.report_receipt_template</field>
+        <field name="report_file">tailor_management.report_receipt_template</field>
+        <field name="print_report_name">'Receipt_%s' % object.name</field>
+        <field name="binding_model_id" ref="model_tailor_order"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_job_card_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <div class="text-center mb-4">
+                            <h2>PRODUCTION JOB CARD</h2>
+                            <h3>Order: <span t-field="o.name"/></h3>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-6">
+                                <strong>Deadline:</strong> <span t-field="o.delivery_date"/><br/>
+                                <strong>Customer:</strong> <span t-field="o.customer_id.name"/><br/>
+                                <strong>Garment Type:</strong> <span t-field="o.garment_type"/>
+                            </div>
+                            <div class="col-6 text-end">
+                                <strong>Fabric:</strong> <span t-field="o.fabric_type"/><br/>
+                                <strong>Color:</strong> <span t-field="o.color"/><br/>
+                                <strong>Assigned Tailor:</strong> <span t-field="o.tailor_id.name"/>
+                            </div>
+                        </div>
+
+                        <h4>Measurements (cm/in)</h4>
+                        <table class="table table-bordered table-sm">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Chest</th>
+                                    <th>Waist</th>
+                                    <th>Hips</th>
+                                    <th>Shoulder</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span t-field="o.chest_measurement"/></td>
+                                    <td><span t-field="o.waist_measurement"/></td>
+                                    <td><span t-field="o.hip_measurement"/></td>
+                                    <td><span t-field="o.shoulder_width"/></td>
+                                </tr>
+                            </tbody>
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Sleeve</th>
+                                    <th>Armhole</th>
+                                    <th>Back Length</th>
+                                    <th>Front Length</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span t-field="o.sleeve_length"/></td>
+                                    <td><span t-field="o.armhole"/></td>
+                                    <td><span t-field="o.back_length"/></td>
+                                    <td><span t-field="o.front_length"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="mt-4 p-3 bg-light border">
+                            <strong>Special Instructions:</strong><br/>
+                            <span t-field="o.special_instructions"/>
+                        </div>
+
+                        <div class="row mt-4" t-if="o.design_image">
+                            <div class="col-12 text-center">
+                                <strong>Design Sketch:</strong><br/>
+                                <img t-att-src="image_data_uri(o.design_image)" style="max-height: 400px; border:1px solid #ccc;"/>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <template id="report_receipt_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <div class="text-center">
+                            <h2>Order Receipt</h2>
+                            <h4><span t-field="o.name"/></h4>
+                        </div>
+                        <hr/>
+
+                        <div class="row mt-4">
+                            <div class="col-6">
+                                <strong>Billed To:</strong><br/>
+                                <span t-field="o.customer_id.name"/><br/>
+                                <span t-field="o.customer_id.phone"/><br/>
+                                <span t-field="o.customer_id.email"/>
+                            </div>
+                            <div class="col-6 text-end">
+                                <strong>Order Date:</strong> <span t-field="o.order_date"/><br/>
+                                <strong>Delivery Date:</strong> <span t-field="o.delivery_date"/><br/>
+                                <strong>Garment:</strong> <span t-field="o.garment_type"/>
+                            </div>
+                        </div>
+
+                        <div class="row mt-5">
+                            <div class="col-12">
+                                <table class="table table-bordered">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Description</th>
+                                            <th class="text-end">Amount</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Tailoring Service: <span t-field="o.garment_type"/></td>
+                                            <td class="text-end"><span t-field="o.total_amount"/></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="row justify-content-end">
+                            <div class="col-4">
+                                <table class="table table-sm table-borderless">
+                                    <tr>
+                                        <td><strong>Total:</strong></td>
+                                        <td class="text-end"><span t-field="o.total_amount"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Advance Paid:</td>
+                                        <td class="text-end text-success">- <span t-field="o.advance_paid"/></td>
+                                    </tr>
+                                    <tr class="border-top">
+                                        <td><strong>Balance Due:</strong></td>
+                                        <td class="text-end text-danger">
+                                            <strong><span t-field="o.balance_due"/></strong>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="text-center mt-5 text-muted">
+                            <p>Thank you for your business!</p>
+                            <small>Please bring this receipt when collecting your order.</small>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

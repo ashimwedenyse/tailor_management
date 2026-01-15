@@ -1,0 +1,60 @@
+<odoo>
+    <record id="view_production_graph" model="ir.ui.view">
+        <field name="name">production.dashboard.graph</field>
+        <field name="model">tailor.order</field>
+        <field name="arch" type="xml">
+            <graph string="Production Stages" type="bar" stacked="1" sample="1">
+                <field name="status"/>
+                <field name="tailor_id"/>
+                <field name="id" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_production_pivot" model="ir.ui.view">
+        <field name="name">production.dashboard.pivot</field>
+        <field name="model">tailor.order</field>
+        <field name="arch" type="xml">
+            <pivot string="Workshop Overview" sample="1">
+                <field name="tailor_id" type="row"/>
+                <field name="status" type="col"/>
+                <field name="id" type="measure" string="Order Count"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_production_filter" model="ir.ui.view">
+        <field name="name">production.dashboard.filter</field>
+        <field name="model">tailor.order</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" string="Order Number"/>
+                <field name="tailor_id"/>
+                <field name="customer_id"/>
+
+                <filter string="Work In Progress" name="wip"
+                        domain="[('status', 'not in', ['draft', 'received', 'delivered', 'cancelled'])]"/>
+
+                <filter string="Ready for Delivery" name="ready"
+                        domain="[('status', '=', 'ready')]"/>
+
+                <filter string="Unassigned Jobs" name="unassigned"
+                        domain="[('tailor_id', '=', False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_production_dashboard" model="ir.actions.act_window">
+        <field name="name">Production Dashboard</field>
+        <field name="res_model">tailor.order</field>
+        <field name="view_mode">graph,pivot</field>
+        <field name="view_id" ref="view_production_graph"/>
+        <field name="search_view_id" ref="view_production_filter"/>
+        <field name="context">{'search_default_wip': 1}</field> </record>
+
+    <menuitem id="menu_production_dashboard"
+              name="Production Dashboard"
+              parent="menu_tailor_root"
+              action="action_production_dashboard"
+              sequence="3"/>
+</odoo>

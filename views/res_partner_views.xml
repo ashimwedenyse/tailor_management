@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_partner_form_inherit_tailor" model="ir.ui.view">
+        <field name="name">res.partner.form.inherit.tailor</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//field[@name='function']" position="after">
+                <field name="is_customer" string="Tailor Customer"/>
+            </xpath>
+
+            <xpath expr="//notebook" position="inside">
+                <page string="Tailoring Info" name="tailoring_info" invisible="not is_customer">
+                    <group>
+                        <group string="Body Measurements">
+                            <field name="chest"/>
+                            <field name="waist"/>
+                            <field name="hip"/>
+                            <field name="shoulder"/>
+                        </group>
+                        <group string="Limb Measurements">
+                            <field name="sleeve"/>
+                            <field name="armhole"/>
+                            <field name="trouser_length"/>
+                        </group>
+                        <group string="Preferences">
+                            <field name="preferred_fit"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+
+        </field>
+    </record>
+
+    <record id="view_res_partner_filter_inherit_tailor" model="ir.ui.view">
+        <field name="name">res.partner.select.inherit.tailor</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_res_partner_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='type_person']" position="before">
+                <filter string="Tailor Customers" name="tailor_customers" domain="[('is_customer', '=', True)]"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,31 @@
+<odoo>
+    <record id="view_order_form_tailor_extension" model="ir.ui.view">
+        <field name="name">sale.order.form.tailor</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//field[@name='partner_shipping_id']" position="after">
+                <field name="garment_type"/>
+                <field name="fabric_type"/>
+                <field name="fabric_color"/>
+            </xpath>
+
+            <xpath expr="//notebook" position="inside">
+                <page string="Tailor Measurements" name="measurements" invisible="not garment_type">
+                    <group>
+                        <group>
+                            <field name="measure_chest"/>
+                            <field name="measure_waist"/>
+                        </group>
+                        <group>
+                            <field name="measure_sleeve"/>
+                            <field name="measure_shoulder"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+
+        </field>
+    </record>
+</odoo>

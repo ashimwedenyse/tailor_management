@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data noupdate="1">
-        
-        <!-- Sequence for Tailor Orders -->
+
         <record id="seq_tailor_order" model="ir.sequence">
             <field name="name">Tailor Order Reference</field>
             <field name="code">tailor.order</field>

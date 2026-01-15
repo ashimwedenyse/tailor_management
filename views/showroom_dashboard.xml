@@ -1,0 +1,53 @@
+<odoo>
+    <record id="view_showroom_graph" model="ir.ui.view">
+        <field name="name">showroom.sales.graph</field>
+        <field name="model">sale.order</field>
+        <field name="arch" type="xml">
+            <graph string="Sales Performance" type="bar" sample="1">
+                <field name="user_id"/>
+                <field name="amount_total" type="measure"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="view_showroom_pivot" model="ir.ui.view">
+        <field name="name">showroom.sales.pivot</field>
+        <field name="model">sale.order</field>
+        <field name="arch" type="xml">
+            <pivot string="Showroom Analysis" sample="1">
+                <field name="user_id" type="row"/>
+                <field name="state" type="col"/>
+                <field name="amount_total" type="measure" string="Total Value"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_showroom_filter" model="ir.ui.view">
+        <field name="name">showroom.sales.filter</field>
+        <field name="model">sale.order</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" string="Order Number"/>
+                <field name="partner_id"/>
+                <field name="user_id"/>
+
+                <filter string="Quotations" name="draft_quotes" domain="[('state', 'in', ['draft', 'sent'])]"/>
+                <filter string="Confirmed Orders" name="sales" domain="[('state', 'in', ['sale', 'done'])]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_showroom_dashboard" model="ir.actions.act_window">
+        <field name="name">Showroom Dashboard</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_mode">graph,pivot</field>
+        <field name="view_id" ref="view_showroom_graph"/>
+        <field name="search_view_id" ref="view_showroom_filter"/>
+    </record>
+
+    <menuitem id="menu_showroom_dashboard"
+              name="Showroom Dashboard"
+              parent="menu_tailor_root"
+              action="action_showroom_dashboard"
+              sequence="2"/>
+</odoo>
